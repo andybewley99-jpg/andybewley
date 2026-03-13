@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TDEE Calculator — The Dream Body Blueprint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0D0D0D;
+    --surface: #161616;
+    --surface2: #1E1E1E;
+    --border: rgba(255,255,255,0.08);
+    --border-hover: rgba(255,255,255,0.15);
+    --accent: #FF3B3B;
+    --accent-dim: rgba(255,59,59,0.12);
+    --accent-dim2: rgba(255,59,59,0.06);
+    --text: #F0F0F0;
+    --text-secondary: rgba(240,240,240,0.5);
+    --text-tertiary: rgba(240,240,240,0.28);
+    --success: #4ADE80;
+    --success-bg: rgba(74,222,128,0.1);
+    --warning: #FBBF24;
+    --warning-bg: rgba(251,191,36,0.1);
+    --radius: 10px;
+    --radius-lg: 16px;
+    --font-head: 'Syne', sans-serif;
+    --font-body: 'Inter', sans-serif;
+  }
+
+  html { font-size: 16px; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .site-header {
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    background: rgba(13,13,13,0.92);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+  }
+  .logo {
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: 0.01em;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .logo span { color: var(--accent); }
+  .header-badge {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid rgba(255,59,59,0.2);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .hero {
+    padding: 5rem 2rem 3rem;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.25rem;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    display: block;
+    width: 20px;
+    height: 1.5px;
+    background: var(--accent);
+  }
+  .hero h1 {
+    font-family: var(--font-head);
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 1rem;
+  }
+  .hero h1 em { font-style: normal; color: var(--accent); }
+  .hero p {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    max-width: 480px;
+    font-weight: 300;
+    line-height: 1.7;
+  }
+
+  .calc-container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 2rem 6rem;
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    margin-bottom: 1.25rem;
+  }
+  .panel-title {
+    font-family: var(--font-head);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 1.5rem;
+  }
+
+  .unit-toggle {
+    display: flex;
+    background: var(--surface2);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    width: fit-content;
+    margin-bottom: 1.75rem;
+    overflow: hidden;
+  }
+  .unit-toggle button {
+    padding: 8px 24px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-tertiary);
+    transition: all 0.2s;
+  }
+  .unit-toggle button.active {
+    background: var(--accent);
+    color: #fff;
+    border-radius: calc(var(--radius) - 2px);
+  }
+
+  .gender-toggle {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 1.75rem;
+  }
+  .gender-btn {
+    flex: 1;
+    padding: 10px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    color: var(--text-tertiary);
+    transition: all 0.2s;
+  }
+  .gender-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-dim2);
+  }
+
+  .input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+  }
+  @media (max-width: 520px) { .input-grid { grid-template-columns: 1fr 1fr; } }
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .input-group label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    letter-spacing: 0.02em;
+  }
+  .input-group input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    font-family: var(--font-head);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s;
+    -moz-appearance: textfield;
+  }
+  .input-group input::-webkit-outer-spin-button,
+  .input-group input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .input-group input:focus { border-color: var(--accent); }
+
+  .activity-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .activity-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .activity-card:hover { border-color: var(--border-hover); }
+  .activity-card.active {
+    border-color: var(--accent);
+    background: var(--accent-dim2);
+  }
+  .ac-left { display: flex; flex-direction: column; gap: 2px; }
+  .ac-name {
+    font-family: var(--font-head);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .activity-card.active .ac-name { color: var(--accent); }
+  .ac-desc {
+    font-size: 12px;
+    color: var(--text-tertiary);
+  }
+  .ac-mult {
+    font-family: var(--font-head);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-tertiary);
+    white-space: nowrap;
+  }
+  .activity-card.active .ac-mult { color: var(--accent); }
+
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 1.25rem;
+  }
+  .metric {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+  }
+  .metric.hero-metric {
+    border-color: rgba(255,59,59,0.3);
+    background: var(--accent-dim2);
+    grid-column: span 2;
+  }
+  .metric .m-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 6px;
+  }
+  .metric.hero-metric .m-label { color: rgba(255,59,59,0.7); }
+  .metric .m-value {
+    font-family: var(--font-head);
+    font-size: 2.25rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+  .metric.hero-metric .m-value { color: var(--accent); font-size: 3rem; }
+  .metric .m-sub {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin-top: 4px;
+  }
+
+  .breakdown {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+  .breakdown-title {
+    font-family: var(--font-head);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 1.25rem;
+  }
+  .breakdown-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .breakdown-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .breakdown-row:first-of-type { padding-top: 0; }
+  .br-label { font-size: 13px; color: var(--text-secondary); }
+  .br-value { font-family: var(--font-head); font-size: 14px; font-weight: 700; color: var(--text); }
+
+  .cta-box {
+    background: var(--surface);
+    border: 1px solid rgba(255,59,59,0.2);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+    text-align: center;
+  }
+  .cta-box p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    line-height: 1.6;
+  }
+  .cta-box p strong { color: var(--text); font-weight: 500; }
+  .cta-link {
+    display: inline-block;
+    padding: 10px 28px;
+    background: var(--accent);
+    color: #fff;
+    font-family: var(--font-head);
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: var(--radius);
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    transition: opacity 0.2s;
+  }
+  .cta-link:hover { opacity: 0.85; }
+
+  .warning-box {
+    display: none;
+    background: var(--warning-bg);
+    border: 1px solid rgba(251,191,36,0.25);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--warning);
+    margin-bottom: 1.25rem;
+  }
+  .warning-box.show { display: block; }
+
+  .site-footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-tertiary);
+  }
+  .site-footer a { color: var(--accent); text-decoration: none; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .panel, .results-grid, .breakdown, .cta-box { animation: fadeUp 0.4s ease both; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="#" class="logo">The <span>Dream Body</span> Blueprint</a>
+  <span class="header-badge">Free Tool</span>
+</header>
+
+<section class="hero">
+  <div class="hero-eyebrow">TDEE Calculator</div>
+  <h1>How many calories do you <em>actually</em> burn?</h1>
+  <p>Your maintenance calories — calculated using the Mifflin-St Jeor formula. Know your number, own your results.</p>
+</section>
+
+<main class="calc-container">
+
+  <!-- STEP 1: UNIT + GENDER -->
+  <div class="panel">
+    <p class="panel-title">Step 1 — Your details</p>
+
+    <div class="unit-toggle">
+      <button class="active" id="btn-metric" onclick="setUnit('metric')">Metric (kg / cm)</button>
+      <button id="btn-imperial" onclick="setUnit('imperial')">Imperial (lbs / ft)</button>
+    </div>
+
+    <div class="gender-toggle">
+      <button class="gender-btn active" id="btn-male" onclick="setGender('male')">Male</button>
+      <button class="gender-btn" id="btn-female" onclick="setGender('female')">Female</button>
+    </div>
+
+    <div class="input-grid" id="input-grid">
+      <div class="input-group">
+        <label id="age-label">Age</label>
+        <input type="number" id="age" value="30" min="16" max="90" step="1" oninput="update()">
+      </div>
+      <div class="input-group">
+        <label id="weight-label">Weight (kg)</label>
+        <input type="number" id="weight" value="80" min="30" max="400" step="0.5" oninput="update()">
+      </div>
+      <div class="input-group">
+        <label id="height-label">Height (cm)</label>
+        <input type="number" id="height" value="175" min="100" max="250" step="1" oninput="update()">
+      </div>
+    </div>
+
+    <!-- Imperial height extras (hidden by default) -->
+    <div id="imperial-height-row" style="display:none; margin-top: 1rem;">
+      <div class="input-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+        <div class="input-group">
+          <label>Age</label>
+          <input type="number" id="age-imp" value="30" min="16" max="90" step="1" oninput="update()">
+        </div>
+        <div class="input-group">
+          <label>Weight (lbs)</label>
+          <input type="number" id="weight-imp" value="176" min="60" max="900" step="1" oninput="update()">
+        </div>
+        <div class="input-group" style="display:flex; gap:8px; flex-direction: column;">
+          <label>Height</label>
+          <div style="display:flex; gap:8px;">
+            <input type="number" id="height-ft" value="5" min="3" max="8" step="1" oninput="update()" style="width:50%;">
+            <input type="number" id="height-in" value="9" min="0" max="11" step="1" oninput="update()" style="width:50%;">
+          </div>
+          <div style="display:flex; gap:8px; font-size:11px; color: var(--text-tertiary);">
+            <span style="width:50%; text-align:center;">ft</span>
+            <span style="width:50%; text-align:center;">in</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: ACTIVITY -->
+  <div class="panel">
+    <p class="panel-title">Step 2 — Activity level</p>
+    <div class="activity-grid" id="activity-grid"></div>
+  </div>
+
+  <!-- WARNING -->
+  <div class="warning-box" id="warning-box"></div>
+
+  <!-- RESULTS -->
+  <div class="results-grid" id="results-grid"></div>
+
+  <!-- BREAKDOWN -->
+  <div class="breakdown" id="breakdown"></div>
+
+  <!-- CTA -->
+  <div class="cta-box" id="cta-box">
+    <p>Now you know your maintenance calories — <strong>want to know exactly what deficit you need to hit your goal weight?</strong></p>
+    <a href="fat-loss-calculator.html" class="cta-link">Use the Fat Loss Calculator →</a>
+  </div>
+
+</main>
+
+<footer class="site-footer">
+  Built by <a href="#">The Dream Body Blueprint</a> &nbsp;·&nbsp; Powered by Andy Bewley &nbsp;·&nbsp; Based on Mifflin-St Jeor equation. Individual results vary.
+</footer>
+
+<script>
+  let unit = 'metric';
+  let gender = 'male';
+  let selectedActivity = 'moderate';
+
+  const activities = [
+    { id: 'sedentary',   name: 'Sedentary',        mult: 1.2,   desc: 'Desk job, little to no exercise · under 5,000 steps/day' },
+    { id: 'light',       name: 'Lightly active',   mult: 1.375, desc: 'Light exercise 1–3x/wk · 5,000–7,500 steps/day' },
+    { id: 'moderate',    name: 'Moderately active', mult: 1.55,  desc: 'Exercise 3–5x/wk · 7,500–10,000 steps/day' },
+    { id: 'active',      name: 'Very active',       mult: 1.725, desc: 'Hard training 6–7x/wk · 10,000–12,500 steps/day' },
+    { id: 'extra',       name: 'Extra active',      mult: 1.9,   desc: 'Physical job + daily training · 12,500+ steps/day' },
+  ];
+
+  function buildActivityGrid() {
+    document.getElementById('activity-grid').innerHTML = activities.map(a => `
+      <div class="activity-card ${a.id === selectedActivity ? 'active' : ''}" onclick="setActivity('${a.id}')">
+        <div class="ac-left">
+          <div class="ac-name">${a.name}</div>
+          <div class="ac-desc">${a.desc}</div>
+        </div>
+        <div class="ac-mult">×${a.mult}</div>
+      </div>
+    `).join('');
+  }
+
+  function setUnit(u) {
+    unit = u;
+    document.getElementById('btn-metric').classList.toggle('active', u === 'metric');
+    document.getElementById('btn-imperial').classList.toggle('active', u === 'imperial');
+    document.getElementById('input-grid').style.display = u === 'metric' ? 'grid' : 'none';
+    document.getElementById('imperial-height-row').style.display = u === 'imperial' ? 'block' : 'none';
+    update();
+  }
+
+  function setGender(g) {
+    gender = g;
+    document.getElementById('btn-male').classList.toggle('active', g === 'male');
+    document.getElementById('btn-female').classList.toggle('active', g === 'female');
+    update();
+  }
+
+  function setActivity(id) {
+    selectedActivity = id;
+    buildActivityGrid();
+    update();
+  }
+
+  function getValues() {
+    if (unit === 'metric') {
+      return {
+        age: parseFloat(document.getElementById('age').value) || 0,
+        weightKg: parseFloat(document.getElementById('weight').value) || 0,
+        heightCm: parseFloat(document.getElementById('height').value) || 0,
+      };
+    } else {
+      const ft = parseFloat(document.getElementById('height-ft').value) || 0;
+      const inches = parseFloat(document.getElementById('height-in').value) || 0;
+      const totalInches = (ft * 12) + inches;
+      return {
+        age: parseFloat(document.getElementById('age-imp').value) || 0,
+        weightKg: (parseFloat(document.getElementById('weight-imp').value) || 0) / 2.2046,
+        heightCm: totalInches * 2.54,
+      };
+    }
+  }
+
+  function update() {
+    const { age, weightKg, heightCm } = getValues();
+    const activity = activities.find(a => a.id === selectedActivity);
+
+    const warnEl = document.getElementById('warning-box');
+    if (!age || !weightKg || !heightCm) {
+      warnEl.textContent = 'Fill in all fields to see your results.';
+      warnEl.classList.add('show');
+      document.getElementById('results-grid').innerHTML = '';
+      document.getElementById('breakdown').innerHTML = '';
+      return;
+    }
+    warnEl.classList.remove('show');
+
+    // Mifflin-St Jeor BMR
+    let bmr;
+    if (gender === 'male') {
+      bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * age) + 5;
+    } else {
+      bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * age) - 161;
+    }
+    bmr = Math.round(bmr);
+    const tdee = Math.round(bmr * activity.mult);
+
+    const weightDisp = unit === 'imperial'
+      ? Math.round(weightKg * 2.2046) + ' lbs'
+      : weightKg.toFixed(1) + ' kg';
+
+    const heightDisp = unit === 'imperial'
+      ? (document.getElementById('height-ft').value || 0) + 'ft ' + (document.getElementById('height-in').value || 0) + 'in'
+      : heightCm + ' cm';
+
+    document.getElementById('results-grid').innerHTML = `
+      <div class="metric hero-metric">
+        <div class="m-label">Your maintenance calories (TDEE)</div>
+        <div class="m-value">${tdee.toLocaleString()} kcal</div>
+        <div class="m-sub">eat this to stay the same weight</div>
+      </div>
+      <div class="metric">
+        <div class="m-label">BMR (at rest)</div>
+        <div class="m-value">${bmr.toLocaleString()}<span style="font-size:1rem"> kcal</span></div>
+        <div class="m-sub">calories if you did nothing all day</div>
+      </div>
+      <div class="metric">
+        <div class="m-label">Activity multiplier</div>
+        <div class="m-value">×${activity.mult}</div>
+        <div class="m-sub">${activity.name}</div>
+      </div>
+      <div class="metric">
+        <div class="m-label">To lose 0.5lbs/wk</div>
+        <div class="m-value">${(tdee - 250).toLocaleString()}<span style="font-size:1rem"> kcal</span></div>
+        <div class="m-sub">250 kcal/day deficit</div>
+      </div>
+      <div class="metric">
+        <div class="m-label">To lose 1lb/wk</div>
+        <div class="m-value">${(tdee - 500).toLocaleString()}<span style="font-size:1rem"> kcal</span></div>
+        <div class="m-sub">500 kcal/day deficit</div>
+      </div>
+    `;
+
+    document.getElementById('breakdown').innerHTML = `
+      <p class="breakdown-title">How we got there</p>
+      <div class="breakdown-row">
+        <span class="br-label">Formula</span>
+        <span class="br-value">Mifflin-St Jeor</span>
+      </div>
+      <div class="breakdown-row">
+        <span class="br-label">Gender</span>
+        <span class="br-value" style="text-transform: capitalize;">${gender}</span>
+      </div>
+      <div class="breakdown-row">
+        <span class="br-label">Age</span>
+        <span class="br-value">${age} years</span>
+      </div>
+      <div class="breakdown-row">
+        <span class="br-label">Weight</span>
+        <span class="br-value">${weightDisp}</span>
+      </div>
+      <div class="breakdown-row">
+        <span class="br-label">Height</span>
+        <span class="br-value">${heightDisp}</span>
+      </div>
+      <div class="breakdown-row">
+        <span class="br-label">BMR calculation</span>
+        <span class="br-value">${bmr.toLocaleString()} kcal</span>
+      </div>
+      <div class="breakdown-row">
+        <span class="br-label">Activity level</span>
+        <span class="br-value">${activity.name} (×${activity.mult})</span>
+      </div>
+    `;
+  }
+
+  buildActivityGrid();
+  update();
+</script>
+</body>
+</html>
