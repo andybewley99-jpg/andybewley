@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calorie Budget Calculator | The Dream Body Blueprint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0D0D0D;
+    --surface: #161616;
+    --surface2: #1E1E1E;
+    --border: rgba(255,255,255,0.08);
+    --border-hover: rgba(255,255,255,0.15);
+    --accent: #FF3B3B;
+    --accent-dim: rgba(255,59,59,0.12);
+    --accent-dim2: rgba(255,59,59,0.06);
+    --text: #F0F0F0;
+    --text-secondary: rgba(240,240,240,0.5);
+    --text-tertiary: rgba(240,240,240,0.28);
+    --success: #4ADE80;
+    --success-bg: rgba(74,222,128,0.1);
+    --warning: #FBBF24;
+    --warning-bg: rgba(251,191,36,0.1);
+    --danger: #F87171;
+    --danger-bg: rgba(248,113,113,0.1);
+    --radius: 10px;
+    --radius-lg: 16px;
+    --font-head: 'Syne', sans-serif;
+    --font-body: 'Inter', sans-serif;
+  }
+
+  html { font-size: 16px; }
+  body {
+    background: var(--bg); color: var(--text); font-family: var(--font-body);
+    min-height: 100vh; line-height: 1.6; -webkit-font-smoothing: antialiased;
+  }
+
+  .site-header {
+    border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex;
+    align-items: center; justify-content: space-between; height: 64px;
+    position: sticky; top: 0; background: rgba(13,13,13,0.92);
+    backdrop-filter: blur(12px); z-index: 100;
+  }
+  .logo { font-family: var(--font-head); font-weight: 800; font-size: 15px; color: var(--text); text-decoration: none; }
+  .logo span { color: var(--accent); }
+  .header-badge {
+    font-size: 11px; font-weight: 500; padding: 4px 12px; border-radius: 20px;
+    background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(255,59,59,0.2);
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+
+  .hero { padding: 5rem 2rem 3rem; max-width: 760px; margin: 0 auto; }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 500;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.25rem;
+  }
+  .hero-eyebrow::before { content: ''; display: block; width: 20px; height: 1.5px; background: var(--accent); }
+  .hero h1 {
+    font-family: var(--font-head); font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 800;
+    line-height: 1.08; letter-spacing: -0.02em; color: var(--text); margin-bottom: 1rem;
+  }
+  .hero h1 em { font-style: normal; color: var(--accent); }
+  .hero p { font-size: 1rem; color: var(--text-secondary); max-width: 480px; font-weight: 300; line-height: 1.7; }
+
+  .calc-container { max-width: 760px; margin: 0 auto; padding: 0 2rem 6rem; }
+
+  .panel {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 2rem; margin-bottom: 1.25rem;
+  }
+  .panel-title {
+    font-family: var(--font-head); font-size: 11px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 1.5rem;
+  }
+
+  .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+  @media (max-width: 520px) { .input-grid { grid-template-columns: 1fr; } }
+
+  .input-group { display: flex; flex-direction: column; gap: 8px; }
+  .input-group label { font-size: 12px; font-weight: 500; color: var(--text-secondary); letter-spacing: 0.02em; }
+  .input-group input {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 12px 16px; font-family: var(--font-head); font-size: 1.5rem; font-weight: 700;
+    color: var(--text); width: 100%; outline: none; transition: border-color 0.2s;
+    -moz-appearance: textfield;
+  }
+  .input-group input::-webkit-outer-spin-button,
+  .input-group input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .input-group input:focus { border-color: var(--accent); }
+  .input-note { font-size: 11px; color: var(--text-tertiary); line-height: 1.5; }
+  .input-note.warning { color: var(--warning); font-weight: 500; }
+
+  .days-selector { display: flex; flex-wrap: wrap; gap: 8px; }
+  .day-btn {
+    padding: 8px 18px; font-family: var(--font-body); font-size: 13px; font-weight: 500;
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 20px;
+    cursor: pointer; color: var(--text-tertiary); transition: all 0.2s;
+  }
+  .day-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim2); font-weight: 600; }
+
+  .results-wrap { display: none; }
+  .results-wrap.show { display: block; }
+
+  .alert-box {
+    border-radius: var(--radius); padding: 14px 16px; margin-bottom: 1.25rem;
+    font-size: 14px; line-height: 1.6;
+  }
+  .alert-box.success { background: var(--success-bg); color: var(--success); border: 1px solid rgba(74,222,128,0.2); }
+  .alert-box.warning { background: var(--warning-bg); color: var(--warning); border: 1px solid rgba(251,191,36,0.2); }
+
+  .results-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 1.25rem;
+  }
+  .metric {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 1.25rem 1.5rem;
+  }
+  .metric.hero-metric { border-color: rgba(255,59,59,0.3); background: var(--accent-dim2); grid-column: span 2; }
+  .metric .m-label { font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 6px; }
+  .metric.hero-metric .m-label { color: rgba(255,59,59,0.7); }
+  .metric .m-value { font-family: var(--font-head); font-size: 2.25rem; font-weight: 800; line-height: 1; color: var(--text); letter-spacing: -0.02em; }
+  .metric.hero-metric .m-value { color: var(--accent); font-size: 3rem; }
+  .metric .m-sub { font-size: 12px; color: var(--text-tertiary); margin-top: 4px; }
+  .metric.good .m-value { color: var(--success); }
+  .metric.warn .m-value { color: var(--warning); }
+
+  .breakdown {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.25rem;
+  }
+  .breakdown-title {
+    font-family: var(--font-head); font-size: 11px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 1.25rem;
+  }
+  .breakdown-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; border-bottom: 1px solid var(--border); gap: 16px;
+  }
+  .breakdown-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .breakdown-row:first-of-type { padding-top: 0; }
+  .br-left { display: flex; flex-direction: column; gap: 2px; }
+  .br-label { font-size: 13px; color: var(--text-secondary); }
+  .br-desc { font-size: 11px; color: var(--text-tertiary); }
+  .br-value { font-family: var(--font-head); font-size: 15px; font-weight: 700; color: var(--text); white-space: nowrap; }
+
+  .week-visual { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 1.5rem; }
+  .wv-day { border-radius: var(--radius); padding: 10px 4px; text-align: center; }
+  .wv-day.normal { background: var(--surface2); border: 1px solid var(--border); }
+  .wv-day.banking { background: var(--warning-bg); border: 1px solid rgba(251,191,36,0.2); }
+  .wv-day.event { background: var(--accent-dim2); border: 1px solid rgba(255,59,59,0.3); }
+  .wv-name { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+  .wv-day.normal .wv-name { color: var(--text-tertiary); }
+  .wv-day.banking .wv-name { color: rgba(251,191,36,0.8); }
+  .wv-day.event .wv-name { color: rgba(255,59,59,0.7); }
+  .wv-cals { font-family: var(--font-head); font-size: 12px; font-weight: 700; }
+  .wv-day.normal .wv-cals { color: var(--text); }
+  .wv-day.banking .wv-cals { color: var(--warning); }
+  .wv-day.event .wv-cals { color: var(--accent); }
+  .wv-tag { font-size: 9px; margin-top: 3px; }
+  .wv-day.normal .wv-tag { color: var(--text-tertiary); }
+  .wv-day.banking .wv-tag { color: rgba(251,191,36,0.6); }
+  .wv-day.event .wv-tag { color: rgba(255,59,59,0.6); }
+
+  .cta-box {
+    background: var(--surface); border: 1px solid rgba(255,59,59,0.2);
+    border-radius: var(--radius-lg); padding: 2rem; margin-bottom: 1.25rem; text-align: center;
+  }
+  .cta-heading { font-family: var(--font-head); font-size: 1.3rem; font-weight: 800; color: var(--accent); margin-bottom: 0.5rem; }
+  .cta-sub { font-size: 14px; color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.6; max-width: 420px; margin-left: auto; margin-right: auto; }
+  .cta-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .cta-btn {
+    display: inline-block; padding: 12px 28px; font-family: var(--font-head); font-size: 13px;
+    font-weight: 700; border-radius: var(--radius); text-decoration: none; letter-spacing: 0.02em; transition: opacity 0.2s;
+  }
+  .cta-btn:hover { opacity: 0.85; }
+  .cta-btn-red { background: var(--accent); color: #fff; }
+  .cta-btn-green { background: var(--success); color: #0D0D0D; }
+
+  .site-footer { border-top: 1px solid var(--border); padding: 2rem; text-align: center; font-size: 12px; color: var(--text-tertiary); }
+  .site-footer a { color: var(--accent); text-decoration: none; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .panel, .results-grid, .breakdown, .alert-box, .cta-box { animation: fadeUp 0.4s ease both; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="#" class="logo">The <span>Dream Body</span> Blueprint</a>
+  <span class="header-badge">Free Tool</span>
+</header>
+
+<section class="hero">
+  <div class="hero-eyebrow">Calorie Budget Calculator</div>
+  <h1>Got a social occasion coming up? Here's how to <em>still make progress.</em></h1>
+</section>
+
+<main class="calc-container">
+
+  <div class="panel">
+    <p class="panel-title">Step 1: Your numbers</p>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Your daily calorie target (kcal)</label>
+        <input type="number" id="daily-cals" value="1800" min="1000" max="5000" step="50" oninput="update()">
+        <span class="input-note">Not sure? Use our <a href="https://andybewley99-jpg.github.io/andybewley/DBBTDEE.html" style="color: var(--accent); text-decoration: none;">TDEE Calculator</a> first.</span>
+      </div>
+      <div class="input-group">
+        <label>Calories of your extra meal (kcal)</label>
+        <input type="number" id="meal-cals" placeholder="e.g. 1200" min="100" max="6000" step="50" oninput="update()">
+        <span class="input-note warning">Always overshoot. Think it's 1000? Enter 1200.</span>
+      </div>
+    </div>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Your minimum daily calories (kcal)</label>
+        <input type="number" id="min-cals" value="1400" min="800" max="3000" step="50" oninput="update()">
+        <span class="input-note">The lowest you are willing to eat on any given day. Be honest.</span>
+      </div>
+    </div>
+
+    <p class="panel-title" style="margin-bottom: 1rem;">Step 2: How many days to bank across?</p>
+    <div class="days-selector">
+      <button class="day-btn" onclick="setDays(1)">1 day</button>
+      <button class="day-btn" onclick="setDays(2)">2 days</button>
+      <button class="day-btn active" onclick="setDays(3)">3 days</button>
+      <button class="day-btn" onclick="setDays(4)">4 days</button>
+      <button class="day-btn" onclick="setDays(5)">5 days</button>
+      <button class="day-btn" onclick="setDays(6)">6 days</button>
+      <button class="day-btn" onclick="setDays(7)">7 days</button>
+      <button class="day-btn" onclick="setDays(8)">8 days</button>
+      <button class="day-btn" onclick="setDays(9)">9 days</button>
+      <button class="day-btn" onclick="setDays(10)">10 days</button>
+      <button class="day-btn" onclick="setDays(11)">11 days</button>
+      <button class="day-btn" onclick="setDays(12)">12 days</button>
+      <button class="day-btn" onclick="setDays(13)">13 days</button>
+      <button class="day-btn" onclick="setDays(14)">14 days</button>
+    </div>
+  </div>
+
+  <div class="results-wrap" id="results-wrap">
+    <div id="alert-area"></div>
+    <div class="results-grid" id="results-grid"></div>
+    <div class="breakdown" id="banking-plan"></div>
+    <div class="breakdown" id="week-visual-wrap"></div>
+
+    <div class="cta-box">
+      <p class="cta-heading">Ready to actually make this happen?</p>
+      <p class="cta-sub">Join the free community or apply to work with Andy directly and stop guessing your way through fat loss.</p>
+      <div class="cta-buttons">
+        <a href="https://www.skool.com/the-dream-body-society-8182/about" target="_blank" class="cta-btn cta-btn-red">Get free help</a>
+        <a href="https://form.typeform.com/to/HfeyEhYy" target="_blank" class="cta-btn cta-btn-green">Apply to work with me</a>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="site-footer">
+  Built by <a href="#">The Dream Body Blueprint</a> &nbsp;·&nbsp; Powered by Andy Bewley
+</footer>
+
+<script>
+  let bankingDays = 3;
+
+  function setDays(n) {
+    bankingDays = n;
+    document.querySelectorAll('.day-btn').forEach((btn, i) => {
+      btn.classList.toggle('active', i + 1 === n);
+    });
+    update();
+  }
+
+  function update() {
+    const daily = parseInt(document.getElementById('daily-cals').value) || 0;
+    const meal = parseInt(document.getElementById('meal-cals').value) || 0;
+    const minCals = parseInt(document.getElementById('min-cals').value) || 1400;
+
+    if (!daily || !meal) {
+      document.getElementById('results-wrap').classList.remove('show');
+      return;
+    }
+
+    // The meal is ALWAYS on top of a normal day of eating.
+    // So the full meal calories need to be banked across the chosen days.
+    const overage = meal;
+    const idealSavePerDay = Math.round(overage / bankingDays);
+    const idealBankingDayCals = daily - idealSavePerDay;
+
+    // Floor check
+    const floorHit = idealBankingDayCals < minCals;
+    const actualBankingDayCals = Math.max(idealBankingDayCals, minCals);
+    const actualSavePerDay = daily - actualBankingDayCals;
+    const actualTotalSaved = actualSavePerDay * bankingDays;
+    const shortfall = overage - actualTotalSaved;
+
+    // How many days would be needed at the floor rate to fully cover it
+    const daysNeededAtFloor = actualSavePerDay > 0 ? Math.ceil(overage / actualSavePerDay) : 99;
+
+    // Alert
+    let alertHTML = '';
+    if (!floorHit) {
+      alertHTML = `<div class="alert-box success">Your banking days sit comfortably at ${actualBankingDayCals.toLocaleString()} kcal each — well above your minimum. Very manageable.</div>`;
+    } else if (daysNeededAtFloor <= 14) {
+      alertHTML = `<div class="alert-box warning">At ${bankingDays} banking day${bankingDays > 1 ? 's' : ''}, your days would drop below your minimum of ${minCals.toLocaleString()} kcal. We have floored it at ${actualBankingDayCals.toLocaleString()} kcal, which leaves ${shortfall.toLocaleString()} kcal unaccounted for. Spread across <strong>${daysNeededAtFloor} days</strong> instead to fully cover it without going below your floor.</div>`;
+    } else {
+      alertHTML = `<div class="alert-box warning">This meal is too large to fully bank without going below your minimum, even across 14 days. You will carry roughly ${shortfall.toLocaleString()} kcal into the week. That is fine — one slightly over week will not derail your progress. Just get straight back on track the next day.</div>`;
+    }
+    document.getElementById('alert-area').innerHTML = alertHTML;
+
+    // Banking day meal split
+    const breakfast = Math.round(actualBankingDayCals * 0.25);
+    const lunch = Math.round(actualBankingDayCals * 0.30);
+    const dinner = Math.round(actualBankingDayCals * 0.35);
+    const snacks = actualBankingDayCals - breakfast - lunch - dinner;
+
+    // Event day total = normal daily eating + the extra meal
+    const eventDayTotal = daily + meal;
+
+    document.getElementById('results-grid').innerHTML = `
+      <div class="metric hero-metric">
+        <div class="m-label">Save per banking day</div>
+        <div class="m-value">${actualSavePerDay.toLocaleString()} kcal</div>
+        <div class="m-sub">less than your normal ${daily.toLocaleString()} kcal, across ${bankingDays} day${bankingDays > 1 ? 's' : ''}</div>
+      </div>
+      <div class="metric">
+        <div class="m-label">Banking day target</div>
+        <div class="m-value">${actualBankingDayCals.toLocaleString()}<span style="font-size:1.1rem"> kcal</span></div>
+        <div class="m-sub">your eat on each banking day</div>
+      </div>
+      <div class="metric">
+        <div class="m-label">Event day total</div>
+        <div class="m-value">${eventDayTotal.toLocaleString()}<span style="font-size:1.1rem"> kcal</span></div>
+        <div class="m-sub">normal eating + your ${meal.toLocaleString()} kcal meal on top</div>
+      </div>
+      <div class="metric">
+        <div class="m-label">Normal days stay at</div>
+        <div class="m-value">${daily.toLocaleString()}<span style="font-size:1.1rem"> kcal</span></div>
+        <div class="m-sub">no changes outside of banking days</div>
+      </div>
+      ${shortfall > 0 ? `
+      <div class="metric warn">
+        <div class="m-label">Unbanked calories</div>
+        <div class="m-value">${shortfall.toLocaleString()}<span style="font-size:1.1rem"> kcal</span></div>
+        <div class="m-sub">over your weekly target — manageable</div>
+      </div>` : ''}
+    `;
+
+    document.getElementById('banking-plan').innerHTML = `
+      <p class="breakdown-title">What to eat on a banking day (${actualBankingDayCals.toLocaleString()} kcal)</p>
+      <div class="breakdown-row">
+        <div class="br-left">
+          <span class="br-label">Breakfast</span>
+          <span class="br-desc">High protein, low volume. Eggs, Greek yogurt, protein shake.</span>
+        </div>
+        <span class="br-value">${breakfast.toLocaleString()} kcal</span>
+      </div>
+      <div class="breakdown-row">
+        <div class="br-left">
+          <span class="br-label">Lunch</span>
+          <span class="br-desc">Lean protein and veg. Chicken salad, tuna, meal prep.</span>
+        </div>
+        <span class="br-value">${lunch.toLocaleString()} kcal</span>
+      </div>
+      <div class="breakdown-row">
+        <div class="br-left">
+          <span class="br-label">Dinner</span>
+          <span class="br-desc">Protein and veg based. Keep it simple tonight.</span>
+        </div>
+        <span class="br-value">${dinner.toLocaleString()} kcal</span>
+      </div>
+      <div class="breakdown-row">
+        <div class="br-left">
+          <span class="br-label">Snacks</span>
+          <span class="br-desc">Fruit, protein bar, or rice cakes if needed.</span>
+        </div>
+        <span class="br-value">${snacks.toLocaleString()} kcal</span>
+      </div>
+      <div class="breakdown-row">
+        <div class="br-left">
+          <span class="br-label" style="font-weight: 600; color: var(--text);">Total</span>
+        </div>
+        <span class="br-value" style="color: var(--success);">${actualBankingDayCals.toLocaleString()} kcal</span>
+      </div>
+    `;
+
+    const weeklyTarget = daily * 7;
+    const weeklyTotal = eventDayTotal + (actualBankingDayCals * bankingDays);
+
+    // Week visual - spans two weeks if banking days exceed 6
+    const allDays = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun','Mon','Tue','Wed','Thu','Fri','Sat','Sun','Sun'];
+    const eventIndex = bankingDays; // event day comes after all banking days
+    const totalDays = bankingDays + 1;
+    const weeklyOver = weeklyTotal - weeklyTarget;
+
+    document.getElementById('week-visual-wrap').innerHTML = `
+      <p class="breakdown-title">Your plan at a glance</p>
+      <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 1.25rem; line-height: 1.6;">Banking days shown before your event. Normal days stay exactly as they are. Adjust to fit whichever day your meal actually falls on.</p>
+      <div style="display: grid; grid-template-columns: repeat(${Math.min(totalDays, 7)}, 1fr); gap: 6px; margin-bottom: ${totalDays > 7 ? '6px' : '1.5rem'};">
+        ${allDays.slice(0, Math.min(totalDays, 7)).map((d, i) => {
+          const isBanking = i < bankingDays;
+          const isEvent = i === eventIndex;
+          const cls = isEvent ? 'event' : isBanking ? 'banking' : 'normal';
+          const cals = isEvent ? eventDayTotal.toLocaleString() : isBanking ? actualBankingDayCals.toLocaleString() : daily.toLocaleString();
+          const tag = isEvent ? 'event day' : isBanking ? 'banking' : 'normal';
+          return `<div class="wv-day ${cls}">
+            <div class="wv-name">${d}</div>
+            <div class="wv-cals">${cals}</div>
+            <div class="wv-tag">${tag}</div>
+          </div>`;
+        }).join('')}
+      </div>
+      ${totalDays > 7 ? `
+      <div style="display: grid; grid-template-columns: repeat(${totalDays - 7}, 1fr); gap: 6px; margin-bottom: 1.5rem;">
+        ${allDays.slice(7, totalDays).map((d, i) => {
+          const globalIndex = i + 7;
+          const isBanking = globalIndex < bankingDays;
+          const isEvent = globalIndex === eventIndex;
+          const cls = isEvent ? 'event' : isBanking ? 'banking' : 'normal';
+          const cals = isEvent ? eventDayTotal.toLocaleString() : isBanking ? actualBankingDayCals.toLocaleString() : daily.toLocaleString();
+          const tag = isEvent ? 'event day' : isBanking ? 'banking' : 'normal';
+          return `<div class="wv-day ${cls}">
+            <div class="wv-name">${d}</div>
+            <div class="wv-cals">${cals}</div>
+            <div class="wv-tag">${tag}</div>
+          </div>`;
+        }).join('')}
+      </div>` : ''}
+      <div class="breakdown-row">
+        <span class="br-label">Total calories over ${totalDays} days</span>
+        <span class="br-value">${weeklyTotal.toLocaleString()} kcal</span>
+      </div>
+      <div class="breakdown-row">
+        <span class="br-label">Target over ${totalDays} days</span>
+        <span class="br-value">${(daily * totalDays).toLocaleString()} kcal</span>
+      </div>
+      <div class="breakdown-row">
+        <span class="br-label">Result</span>
+        <span class="br-value" style="color: ${weeklyOver <= 0 ? 'var(--success)' : 'var(--warning)'};">${weeklyOver <= 0 ? 'On track' : weeklyOver.toLocaleString() + ' kcal over — manageable'}</span>
+      </div>
+    `;
+
+    document.getElementById('results-wrap').classList.add('show');
+  }
+
+  update();
+</script>
+</body>
+</html>
