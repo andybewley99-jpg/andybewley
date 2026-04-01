@@ -1,0 +1,1984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DBB DM Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #06040f;
+    --surface: rgba(140,90,255,0.06);
+    --surface2: rgba(140,90,255,0.11);
+    --border: rgba(140,90,255,0.18);
+    --border-bright: rgba(180,140,255,0.32);
+    --purple: #9b5de5;
+    --purple2: #c084fc;
+    --purple3: #7c3aed;
+    --purple-glow: rgba(155,93,229,0.35);
+    --purple-dim: rgba(155,93,229,0.15);
+    --white: #f5f0ff;
+    --silver: #c4b5fd;
+    --silver-dim: #6b5a8a;
+    --text-muted: #3a2f52;
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-ui: 'Rajdhani', sans-serif;
+    --font-body: 'Inter', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    padding: 0 0 80px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Deep purple ambient background */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -250px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 700px;
+    background: radial-gradient(ellipse, rgba(124,58,237,0.18) 0%, rgba(155,93,229,0.06) 40%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -150px;
+    right: -150px;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(ellipse, rgba(192,132,252,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Glimmer keyframe - sweeping shimmer across surfaces */
+  @keyframes glimmer {
+    0%   { transform: translateX(-120%) skewX(-15deg); opacity: 0; }
+    20%  { opacity: 1; }
+    80%  { opacity: 1; }
+    100% { transform: translateX(220%) skewX(-15deg); opacity: 0; }
+  }
+
+  @keyframes glimmer-slow {
+    0%   { transform: translateX(-150%) skewX(-20deg); opacity: 0; }
+    15%  { opacity: 0.7; }
+    85%  { opacity: 0.7; }
+    100% { transform: translateX(250%) skewX(-20deg); opacity: 0; }
+  }
+
+  @keyframes countpop {
+    0%   { transform: scale(1); }
+    30%  { transform: scale(1.45) translateY(-4px); }
+    60%  { transform: scale(0.93); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes flashbg {
+    0%   { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 20px var(--purple-glow); }
+    50%       { box-shadow: 0 0 40px var(--purple-glow), 0 0 60px rgba(124,58,237,0.2); }
+  }
+
+  .screen, .header, .flash-overlay, .toast { position: relative; z-index: 1; }
+
+  /* ─── HEADER ─────────────────────────────────────── */
+  .header {
+    background: rgba(6,4,15,0.94);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-bottom: 1px solid var(--border);
+    padding: 13px 18px 11px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-left { display: flex; align-items: center; gap: 12px; }
+
+  .logo-mark {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--purple) 0%, var(--purple3) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 15px;
+    letter-spacing: 1px;
+    color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 22px var(--purple-glow), inset 0 1px 0 rgba(255,255,255,0.2);
+    position: relative;
+    overflow: hidden;
+    animation: pulseGlow 3s ease-in-out infinite;
+  }
+
+  .logo-mark::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.25) 50%, transparent 70%);
+    animation: glimmer 4s ease-in-out infinite 1s;
+  }
+
+  .header-title {
+    font-family: var(--font-display);
+    font-size: 24px;
+    letter-spacing: 3px;
+    color: var(--white);
+    line-height: 1;
+    text-shadow: 0 0 30px rgba(192,132,252,0.3);
+  }
+
+  .header-sub {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    color: var(--silver-dim);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 1px;
+  }
+
+  /* ─── NAV TABS ─────────────────────────────────────── */
+  .nav-tabs {
+    display: flex;
+    gap: 2px;
+    background: rgba(140,90,255,0.05);
+    border: 1px solid var(--border);
+    padding: 3px;
+    border-radius: 12px;
+  }
+
+  .nav-tab {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 5px 11px;
+    background: transparent;
+    border: none;
+    color: var(--silver-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 9px;
+  }
+
+  .nav-tab.active {
+    background: linear-gradient(135deg, var(--purple) 0%, var(--purple3) 100%);
+    color: #fff;
+    box-shadow: 0 0 14px var(--purple-glow);
+  }
+
+  .nav-tab:hover:not(.active) { color: var(--silver); background: rgba(140,90,255,0.08); }
+
+  /* ─── DATE STRIP ─────────────────────────────────── */
+  .date-strip {
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .date-label {
+    font-family: var(--font-display);
+    font-size: 26px;
+    letter-spacing: 2px;
+    color: var(--white);
+  }
+
+  .date-label span { color: var(--purple2); }
+
+  .total-badge {
+    background: var(--surface);
+    border: 1px solid var(--border-bright);
+    padding: 7px 16px;
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--silver-dim);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .total-badge::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.07) 50%, transparent 70%);
+    animation: glimmer-slow 5s ease-in-out infinite 2s;
+  }
+
+  .total-badge span {
+    font-family: var(--font-display);
+    color: var(--purple2);
+    font-size: 32px;
+    line-height: 1;
+    text-shadow: 0 0 20px var(--purple-glow);
+    letter-spacing: 1px;
+  }
+
+  /* ─── SCREENS ─────────────────────────────────────── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ─── CATEGORY CARDS ─────────────────────────────── */
+  .categories-grid {
+    padding: 14px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .category-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    position: relative;
+    border-radius: 14px;
+  }
+
+  /* Glimmer sweep on category cards */
+  .category-card::before {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 60%;
+    background: linear-gradient(105deg, transparent 0%, rgba(192,132,252,0.06) 50%, transparent 100%);
+    animation: glimmer-slow 6s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Top highlight line */
+  .category-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 12px; right: 12px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(192,132,252,0.25), transparent);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .category-card:hover {
+    border-color: var(--border-bright);
+    box-shadow: 0 6px 28px rgba(124,58,237,0.2), 0 0 0 1px rgba(140,90,255,0.12);
+  }
+
+  .cat-tap-btn {
+    flex: 1;
+    padding: 18px 20px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  .cat-tap-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(155,93,229,0.18) 0%, transparent 70%);
+    border-radius: 12px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .cat-tap-btn:active::after { opacity: 1; }
+
+  .cat-color-bar {
+    width: 3px;
+    height: 44px;
+    flex-shrink: 0;
+    border-radius: 2px;
+    box-shadow: 0 0 10px currentColor;
+  }
+
+  .cat-info { flex: 1; }
+
+  .cat-name {
+    font-family: var(--font-display);
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: var(--white);
+    line-height: 1;
+  }
+
+  .cat-desc {
+    font-family: var(--font-body);
+    font-size: 11px;
+    color: var(--silver-dim);
+    margin-top: 4px;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+  }
+
+  .cat-count-area {
+    display: flex;
+    align-items: center;
+    border-left: 1px solid var(--border);
+    z-index: 1;
+  }
+
+  .cat-count {
+    font-family: var(--font-display);
+    font-size: 52px;
+    line-height: 1;
+    color: var(--white);
+    min-width: 80px;
+    text-align: center;
+    padding: 0 18px;
+    transition: color 0.1s, text-shadow 0.1s;
+    letter-spacing: 1px;
+    text-shadow: 0 0 30px rgba(192,132,252,0.1);
+  }
+
+  .cat-count.pop {
+    color: var(--purple2);
+    text-shadow: 0 0 30px var(--purple-glow), 0 0 60px rgba(192,132,252,0.3);
+    animation: countpop 0.3s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+  }
+
+  .cat-minus-btn {
+    background: transparent;
+    border: none;
+    border-left: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 22px;
+    cursor: pointer;
+    padding: 0 16px;
+    height: 100%;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s, background 0.2s;
+    font-family: var(--font-ui);
+    font-weight: 600;
+    z-index: 1;
+    border-radius: 0 14px 14px 0;
+  }
+
+  .cat-minus-btn:hover {
+    color: var(--purple2);
+    background: var(--purple-dim);
+  }
+
+  /* ─── FLASH OVERLAY ──────────────────────────────── */
+  .flash-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse at center, rgba(155,93,229,0.14) 0%, transparent 70%);
+    pointer-events: none;
+    opacity: 0;
+    z-index: 999;
+  }
+
+  .flash-overlay.show { animation: flashbg 0.4s ease; }
+
+  /* ─── SUMMARY BAR ─────────────────────────────────── */
+  .summary-bar {
+    padding: 10px 14px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .summary-chip {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 5px 11px;
+    border-radius: 20px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .summary-chip:hover { border-color: var(--border-bright); box-shadow: 0 0 10px var(--purple-dim); }
+
+  .summary-chip-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+  .summary-chip-label {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: var(--silver-dim);
+    letter-spacing: 0.8px;
+  }
+
+  .summary-chip-count {
+    font-family: var(--font-display);
+    font-size: 18px;
+    color: var(--white);
+    letter-spacing: 0.5px;
+  }
+
+  /* ─── MANAGE SECTION ─────────────────────────────── */
+  .section-header {
+    padding: 22px 18px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    letter-spacing: 3px;
+    color: var(--silver-dim);
+  }
+
+  .btn-add {
+    background: linear-gradient(135deg, var(--purple) 0%, var(--purple3) 100%);
+    border: none;
+    color: #fff;
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 8px 18px;
+    cursor: pointer;
+    transition: box-shadow 0.2s;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-add::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
+    animation: glimmer 3s ease-in-out infinite 0.5s;
+  }
+
+  .btn-add:hover { box-shadow: 0 0 20px var(--purple-glow); }
+
+  /* ─── ADD FORM ─────────────────────────────────────── */
+  .add-form {
+    margin: 0 14px 14px;
+    background: rgba(155,93,229,0.07);
+    border: 1px solid rgba(155,93,229,0.25);
+    padding: 16px;
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    border-radius: 12px;
+  }
+
+  .add-form.open { display: flex; }
+
+  .add-form input {
+    background: rgba(6,4,15,0.6);
+    border: 1px solid var(--border-bright);
+    color: var(--white);
+    font-family: var(--font-body);
+    font-size: 14px;
+    padding: 10px 14px;
+    outline: none;
+    width: 100%;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    border-radius: 8px;
+  }
+
+  .add-form input:focus { border-color: var(--purple); box-shadow: 0 0 0 2px var(--purple-dim); }
+  .add-form input::placeholder { color: var(--text-muted); }
+
+  .color-picker-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+  .color-picker-label {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    color: var(--silver-dim);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .color-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+  }
+
+  .color-dot.selected {
+    border-color: var(--white);
+    transform: scale(1.25);
+    box-shadow: 0 0 12px rgba(255,255,255,0.35);
+  }
+
+  .add-form-btns { display: flex; gap: 8px; }
+
+  .btn-confirm {
+    background: linear-gradient(135deg, var(--purple) 0%, var(--purple3) 100%);
+    border: none;
+    color: #fff;
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 10px 20px;
+    cursor: pointer;
+    flex: 1;
+    transition: box-shadow 0.2s;
+    border-radius: 8px;
+  }
+
+  .btn-confirm:hover { box-shadow: 0 0 20px var(--purple-glow); }
+
+  .btn-cancel {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    color: var(--silver-dim);
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 10px 18px;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+    border-radius: 8px;
+  }
+
+  .btn-cancel:hover { border-color: var(--border-bright); color: var(--white); }
+
+  /* ─── MANAGE LIST ─────────────────────────────────── */
+  .manage-list { padding: 0 14px; display: flex; flex-direction: column; gap: 6px; }
+
+  .manage-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    gap: 12px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    border-radius: 10px;
+  }
+
+  .manage-item:hover { border-color: var(--border-bright); box-shadow: 0 4px 16px rgba(124,58,237,0.1); }
+
+  .manage-color { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 6px currentColor; }
+
+  .manage-name { font-family: var(--font-display); font-size: 18px; letter-spacing: 1.5px; flex: 1; }
+
+  .manage-desc-text { font-family: var(--font-body); font-size: 12px; color: var(--silver-dim); flex: 1; }
+
+  .btn-delete {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px 8px;
+    transition: color 0.15s;
+  }
+
+  .btn-delete:hover { color: var(--purple2); }
+
+  /* ─── HISTORY ─────────────────────────────────────── */
+  .history-list { padding: 14px 14px; display: flex; flex-direction: column; gap: 8px; }
+
+  .history-day {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    border-radius: 12px;
+  }
+
+  .history-day:hover { border-color: var(--border-bright); box-shadow: 0 4px 20px rgba(124,58,237,0.1); }
+
+  .history-day-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .history-day-header::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(192,132,252,0.2), transparent);
+    pointer-events: none;
+  }
+
+  .history-day-header:hover { background: var(--surface2); }
+
+  .history-day-date { font-family: var(--font-display); font-size: 17px; letter-spacing: 2px; }
+
+  .history-day-total {
+    font-family: var(--font-display);
+    font-size: 22px;
+    letter-spacing: 1px;
+    color: var(--purple2);
+    text-shadow: 0 0 14px var(--purple-glow);
+  }
+
+  .history-day-body {
+    display: none;
+    padding: 10px 18px 14px;
+    border-top: 1px solid var(--border);
+  }
+
+  .history-day-body.open { display: block; }
+
+  .history-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .history-row:last-child { border-bottom: none; }
+
+  .history-cat-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--silver);
+    font-weight: 400;
+    letter-spacing: 0.3px;
+  }
+
+  .history-cat-dot { width: 7px; height: 7px; border-radius: 50%; }
+
+  .history-cat-count { font-family: var(--font-display); font-size: 22px; letter-spacing: 1px; color: var(--white); }
+
+  /* ─── EMPTY STATE ─────────────────────────────────── */
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+  .empty-state .empty-icon { font-size: 36px; margin-bottom: 14px; opacity: 0.4; }
+  .empty-state p { font-family: var(--font-display); font-size: 20px; letter-spacing: 3px; color: var(--silver-dim); }
+  .empty-state small { font-family: var(--font-body); font-size: 12px; color: var(--text-muted); margin-top: 8px; display: block; letter-spacing: 0.3px; }
+
+  /* ─── DANGER ZONE ─────────────────────────────────── */
+  .danger-zone {
+    margin: 32px 14px 0;
+    border: 1px solid rgba(155,93,229,0.2);
+    padding: 16px;
+    background: rgba(155,93,229,0.04);
+    border-radius: 12px;
+  }
+
+  .danger-title {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+
+  .btn-danger {
+    background: transparent;
+    border: 1px solid rgba(155,93,229,0.3);
+    color: rgba(155,93,229,0.7);
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+    border-radius: 6px;
+  }
+
+  .btn-danger:hover { border-color: var(--purple); color: var(--purple2); background: var(--purple-dim); }
+
+  /* ─── TOAST ──────────────────────────────────────── */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: linear-gradient(135deg, var(--purple) 0%, var(--purple3) 100%);
+    color: #fff;
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 11px 28px;
+    z-index: 1000;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    white-space: nowrap;
+    box-shadow: 0 8px 32px var(--purple-glow);
+    border-radius: 20px;
+    overflow: hidden;
+    position: fixed;
+  }
+
+  .toast::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
+    animation: glimmer 2s ease-in-out infinite;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ─── WEEK/MONTH SHARED NAV ──────────────────────── */
+  .week-nav, .month-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .week-nav-btn, .month-nav-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--silver-dim);
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 7px 16px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s, box-shadow 0.2s;
+    border-radius: 8px;
+  }
+
+  .week-nav-btn:hover, .month-nav-btn:hover { border-color: var(--purple); color: var(--white); box-shadow: 0 0 14px var(--purple-glow); }
+  .week-nav-btn:disabled, .month-nav-btn:disabled { opacity: 0.2; cursor: default; box-shadow: none; }
+
+  .week-nav-label, .month-nav-label {
+    font-family: var(--font-display);
+    font-size: 20px;
+    letter-spacing: 3px;
+    color: var(--white);
+    text-align: center;
+  }
+
+  .week-nav-label span, .month-nav-label span { color: var(--purple2); }
+
+  /* ─── PERIOD TOTALS BAR ──────────────────────────── */
+  .week-totals-bar, .month-totals-bar {
+    padding: 12px 14px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+    background: rgba(140,90,255,0.03);
+    align-items: center;
+  }
+
+  .week-total-chip, .month-total-chip {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    border-radius: 20px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .week-total-chip:hover, .month-total-chip:hover { border-color: var(--border-bright); box-shadow: 0 0 8px var(--purple-dim); }
+
+  .week-total-chip-dot, .month-total-chip-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  .week-total-chip-label, .month-total-chip-label {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: var(--silver-dim);
+    letter-spacing: 0.8px;
+  }
+
+  .week-total-chip-count, .month-total-chip-count {
+    font-family: var(--font-display);
+    font-size: 18px;
+    letter-spacing: 0.5px;
+    color: var(--white);
+  }
+
+  .week-grand-total, .month-grand-chip {
+    margin-left: auto;
+    font-family: var(--font-display);
+    font-size: 26px;
+    color: var(--purple2);
+    letter-spacing: 1px;
+    text-shadow: 0 0 18px var(--purple-glow);
+    padding-left: 12px;
+    border-left: 1px solid var(--border);
+  }
+
+  /* ─── WEEK CHART ─────────────────────────────────── */
+  .week-chart-wrap {
+    padding: 20px 14px 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .week-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 110px;
+    position: relative;
+  }
+
+  .week-bar-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    height: 100%;
+    justify-content: flex-end;
+  }
+
+  .week-bar-stack {
+    width: 100%;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 1px;
+    min-height: 4px;
+    transition: height 0.4s ease;
+    border-radius: 4px 4px 0 0;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Glimmer on bar stacks */
+  .week-bar-stack::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.12) 50%, transparent 80%);
+    animation: glimmer-slow 5s ease-in-out infinite;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .week-bar-segment { width: 100%; min-height: 3px; transition: height 0.4s ease; }
+
+  .week-bar-label {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--silver-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+  }
+
+  .week-bar-label.today-label { color: var(--purple2); }
+  .week-bar-total { font-family: var(--font-display); font-size: 13px; letter-spacing: 0.5px; color: var(--silver); text-align: center; min-height: 16px; }
+  .week-bar-total.zero { color: var(--text-muted); }
+
+  /* ─── WEEK DAYS LIST ─────────────────────────────── */
+  .week-days-list { padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
+
+  .week-day-row {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    border-radius: 10px;
+  }
+
+  .week-day-row:hover { border-color: var(--border-bright); box-shadow: 0 4px 16px rgba(124,58,237,0.12); }
+
+  .week-day-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 11px 16px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+
+  .week-day-header:hover { background: var(--surface2); }
+
+  .week-day-name { font-family: var(--font-display); font-size: 17px; letter-spacing: 2px; color: var(--white); }
+  .week-day-name.is-today { color: var(--purple2); text-shadow: 0 0 14px var(--purple-glow); }
+  .week-day-name.is-future { color: var(--text-muted); }
+  .week-day-right { display: flex; align-items: center; gap: 10px; }
+  .week-day-mini-chips { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+  .week-day-mini-chip { display: flex; align-items: center; gap: 4px; font-family: var(--font-ui); font-weight: 600; font-size: 11px; color: var(--silver-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+  .week-day-mini-dot { width: 5px; height: 5px; border-radius: 50%; }
+  .week-day-total-num { font-family: var(--font-display); font-size: 24px; letter-spacing: 1px; color: var(--white); min-width: 32px; text-align: right; }
+  .week-day-total-num.zero { color: var(--text-muted); }
+  .week-day-body { display: none; padding: 8px 16px 12px; border-top: 1px solid var(--border); }
+  .week-day-body.open { display: block; }
+  .week-day-detail-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); }
+  .week-day-detail-row:last-child { border-bottom: none; }
+  .week-day-detail-name { display: flex; align-items: center; gap: 9px; font-family: var(--font-body); font-size: 13px; color: var(--silver); font-weight: 400; }
+  .week-day-detail-dot { width: 7px; height: 7px; border-radius: 50%; }
+  .week-day-detail-count { font-family: var(--font-display); font-size: 20px; letter-spacing: 1px; color: var(--white); }
+
+  /* ─── MONTH CALENDAR ─────────────────────────────── */
+  .month-dow-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    border-bottom: 1px solid var(--border);
+    padding: 0 10px;
+    background: rgba(140,90,255,0.03);
+  }
+
+  .month-dow-cell {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--silver-dim);
+    text-align: center;
+    padding: 8px 0 6px;
+  }
+
+  .month-grid { display: grid; grid-template-columns: repeat(7, 1fr); padding: 8px 10px 10px; gap: 4px; }
+
+  .month-cell {
+    min-height: 68px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 6px 7px 5px;
+    cursor: pointer;
+    position: relative;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 10px;
+  }
+
+  /* Glimmer shimmer on each cell */
+  .month-cell::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(192,132,252,0.2), transparent);
+    pointer-events: none;
+  }
+
+  .month-cell:hover:not(.month-cell-empty):not(.month-cell-future) {
+    border-color: var(--border-bright);
+    background: var(--surface2);
+    box-shadow: 0 4px 20px rgba(124,58,237,0.2);
+  }
+
+  .month-cell-empty { background: transparent; border-color: transparent; cursor: default; }
+  .month-cell-empty::before { display: none; }
+  .month-cell-future { opacity: 0.3; cursor: default; }
+
+  .month-cell-today {
+    border-color: rgba(155,93,229,0.55) !important;
+    background: rgba(155,93,229,0.08) !important;
+    box-shadow: 0 0 0 1px rgba(155,93,229,0.2), 0 0 20px rgba(155,93,229,0.1) !important;
+  }
+
+  .month-cell-date {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--silver-dim);
+    line-height: 1;
+    margin-bottom: 3px;
+    letter-spacing: 0.3px;
+  }
+
+  .month-cell-today .month-cell-date { color: var(--purple2); }
+
+  .month-cell-total {
+    font-family: var(--font-display);
+    font-size: 24px;
+    line-height: 1;
+    color: var(--white);
+    margin-bottom: 2px;
+    letter-spacing: 0.5px;
+    text-shadow: 0 0 20px rgba(192,132,252,0.15);
+  }
+
+  .month-cell-total.zero { color: transparent; font-size: 0; }
+  .month-cell-dots { display: flex; flex-wrap: wrap; gap: 2px; margin-top: auto; }
+  .month-cell-dot { width: 4px; height: 4px; border-radius: 50%; }
+  .month-heat-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; opacity: 0.8; }
+
+  /* ─── MONTH DETAIL PANEL ─────────────────────────── */
+  .month-detail-panel {
+    margin: 0 10px 16px;
+    background: rgba(155,93,229,0.07);
+    border: 1px solid rgba(155,93,229,0.25);
+    overflow: hidden;
+    display: none;
+    box-shadow: 0 8px 32px rgba(124,58,237,0.2);
+    border-radius: 12px;
+  }
+
+  .month-detail-panel.open { display: block; }
+
+  .month-detail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px;
+    border-bottom: 1px solid rgba(155,93,229,0.2);
+    background: rgba(155,93,229,0.06);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .month-detail-header::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(192,132,252,0.4), transparent);
+  }
+
+  .month-detail-date { font-family: var(--font-display); font-size: 18px; letter-spacing: 2px; }
+
+  .month-detail-total {
+    font-family: var(--font-display);
+    font-size: 24px;
+    letter-spacing: 1px;
+    color: var(--purple2);
+    text-shadow: 0 0 16px var(--purple-glow);
+  }
+
+  .month-detail-close { background: transparent; border: none; color: var(--silver-dim); font-size: 16px; cursor: pointer; padding: 2px 8px; transition: color 0.15s; }
+  .month-detail-close:hover { color: var(--white); }
+  .month-detail-rows { padding: 10px 18px 14px; }
+
+  .month-detail-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .month-detail-row:last-child { border-bottom: none; }
+
+  .month-detail-name { display: flex; align-items: center; gap: 10px; font-family: var(--font-body); font-size: 13px; color: var(--silver); font-weight: 400; }
+  .month-detail-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .month-detail-count { font-family: var(--font-display); font-size: 22px; letter-spacing: 1px; color: var(--white); }
+
+  @media (max-width: 420px) {
+    .cat-count { font-size: 42px; min-width: 64px; padding: 0 12px; }
+    .header-title { font-size: 20px; letter-spacing: 2px; }
+    .nav-tab { padding: 5px 8px; font-size: 10px; letter-spacing: 0.5px; }
+    .month-cell { min-height: 52px; padding: 4px 5px 3px; border-radius: 8px; }
+    .month-cell-total { font-size: 20px; }
+  }
+</style>
+
+
+</head>
+<body>
+
+<div class="flash-overlay" id="flashOverlay"></div>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo-mark">DBB</div>
+    <div>
+      <div class="header-title">DM Tracker</div>
+      <div class="header-sub">Outreach Counter</div>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchTab('today')">Today</button>
+    <button class="nav-tab" onclick="switchTab('week')">Week</button>
+    <button class="nav-tab" onclick="switchTab('month')">Month</button>
+    <button class="nav-tab" onclick="switchTab('history')">History</button>
+    <button class="nav-tab" onclick="switchTab('manage')">Manage</button>
+  </div>
+</div>
+
+<!-- TODAY SCREEN -->
+<div class="screen active" id="screen-today">
+  <div class="date-strip">
+    <div class="date-label" id="todayLabel">Loading...</div>
+    <div class="total-badge">Total: <span id="totalCount">0</span></div>
+  </div>
+  <div class="summary-bar" id="summaryBar"></div>
+  <div class="categories-grid" id="categoriesGrid"></div>
+</div>
+
+<!-- WEEK SCREEN -->
+<div class="screen" id="screen-week">
+  <div class="week-nav">
+    <button class="week-nav-btn" onclick="shiftWeek(-1)">&#8592; Prev</button>
+    <div class="week-nav-label" id="weekNavLabel"></div>
+    <button class="week-nav-btn" id="weekNextBtn" onclick="shiftWeek(1)">Next &#8594;</button>
+  </div>
+  <div class="week-totals-bar" id="weekTotalsBar"></div>
+  <div class="week-chart-wrap">
+    <div class="week-chart" id="weekChart"></div>
+  </div>
+  <div class="week-days-list" id="weekDaysList"></div>
+</div>
+
+<!-- MONTH SCREEN -->
+<div class="screen" id="screen-month">
+  <div class="month-nav">
+    <button class="month-nav-btn" onclick="shiftMonth(-1)">&#8592; Prev</button>
+    <div class="month-nav-label" id="monthNavLabel"></div>
+    <button class="month-nav-btn" id="monthNextBtn" onclick="shiftMonth(1)">Next &#8594;</button>
+  </div>
+  <div class="month-totals-bar" id="monthTotalsBar"></div>
+  <div class="month-dow-header">
+    <div class="month-dow-cell">M</div>
+    <div class="month-dow-cell">T</div>
+    <div class="month-dow-cell">W</div>
+    <div class="month-dow-cell">T</div>
+    <div class="month-dow-cell">F</div>
+    <div class="month-dow-cell">S</div>
+    <div class="month-dow-cell">S</div>
+  </div>
+  <div class="month-grid" id="monthGrid"></div>
+  <div class="month-detail-panel" id="monthDetailPanel">
+    <div class="month-detail-header">
+      <div class="month-detail-date" id="monthDetailDate"></div>
+      <div class="month-detail-total" id="monthDetailTotal"></div>
+      <button class="month-detail-close" onclick="closeMonthDetail()">&#10005;</button>
+    </div>
+    <div class="month-detail-rows" id="monthDetailRows"></div>
+  </div>
+</div>
+
+
+  <div class="history-list" id="historyList"></div>
+</div>
+
+<!-- MANAGE SCREEN -->
+<div class="screen" id="screen-manage">
+  <div class="section-header">
+    <div class="section-title">Offer Categories</div>
+    <button class="btn-add" onclick="toggleAddForm()">+ Add</button>
+  </div>
+
+  <div class="add-form" id="addForm">
+    <input type="text" id="newCatName" placeholder="Category name (e.g. Case Study)" maxlength="30">
+    <input type="text" id="newCatDesc" placeholder="Description (optional)" maxlength="50">
+    <div class="color-picker-row">
+      <span class="color-picker-label">Colour:</span>
+      <div id="colorPicker"></div>
+    </div>
+    <div class="add-form-btns">
+      <button class="btn-confirm" onclick="confirmAddCategory()">Add Category</button>
+      <button class="btn-cancel" onclick="toggleAddForm()">Cancel</button>
+    </div>
+  </div>
+
+  <div class="manage-list" id="manageList"></div>
+
+  <div class="danger-zone">
+    <div class="danger-title">Danger Zone</div>
+    <button class="btn-danger" onclick="clearTodayData()">Clear Today's Data</button>
+    &nbsp;
+    <button class="btn-danger" onclick="clearAllHistory()">Clear All History</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var STORAGE_KEY = "dbb_dm_tracker_v1";
+var CATS_KEY = "dbb_dm_cats_v1";
+var weekOffset = 0;
+var monthOffset = 0;
+var selectedMonthDay = null;
+
+var PALETTE = [
+  "#9b5de5","#c084fc","#7c3aed","#4caf80","#3a9bdc","#f7c948","#e91e8c","#c8c8c8","#ff9800","#00bcd4"
+];
+
+var selectedColor = PALETTE[0];
+var activeTab = "today";
+
+function getTodayKey() {
+  var d = new Date();
+  return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+}
+
+function formatDateLabel(key) {
+  var parts = key.split("-");
+  var d = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+  var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  var months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  return days[d.getDay()] + " <span>" + d.getDate() + " " + months[d.getMonth()] + "</span>";
+}
+
+function loadData() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+  catch(e) { return {}; }
+}
+
+function saveData(data) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function loadCats() {
+  try {
+    var stored = JSON.parse(localStorage.getItem(CATS_KEY));
+    if (stored && stored.length) return stored;
+  } catch(e) {}
+  return [
+    { id: "case_study", name: "Case Study", desc: "Free/discounted case study offer", color: "#9b5de5" },
+    { id: "discovery_call", name: "Discovery Call", desc: "Invite to book a call", color: "#3a9bdc" },
+    { id: "free_value", name: "Free Value", desc: "Sending tips, content, resources", color: "#4caf80" },
+    { id: "follow_up", name: "Follow Up", desc: "Warm lead re-engagement", color: "#f7c948" },
+    { id: "general_dm", name: "General DM", desc: "Opening conversations", color: "#c8c8c8" }
+  ];
+}
+
+function saveCats(cats) {
+  localStorage.setItem(CATS_KEY, JSON.stringify(cats));
+}
+
+function getCatById(id) {
+  return loadCats().find(function(c) { return c.id === id; });
+}
+
+function getTodayData() {
+  var data = loadData();
+  var key = getTodayKey();
+  if (!data[key]) data[key] = {};
+  return { data: data, key: key };
+}
+
+function increment(catId) {
+  var t = getTodayData();
+  t.data[t.key][catId] = (t.data[t.key][catId] || 0) + 1;
+  saveData(t.data);
+  renderToday();
+  flashScreen();
+  animateCount(catId);
+}
+
+function decrement(catId) {
+  var t = getTodayData();
+  var current = t.data[t.key][catId] || 0;
+  if (current <= 0) return;
+  t.data[t.key][catId] = current - 1;
+  saveData(t.data);
+  renderToday();
+}
+
+function animateCount(catId) {
+  var el = document.getElementById("count-" + catId);
+  if (!el) return;
+  el.classList.remove("pop");
+  void el.offsetWidth;
+  el.classList.add("pop");
+}
+
+function flashScreen() {
+  var el = document.getElementById("flashOverlay");
+  el.classList.remove("show");
+  void el.offsetWidth;
+  el.classList.add("show");
+}
+
+function getTodayCounts() {
+  var t = getTodayData();
+  return t.data[t.key];
+}
+
+function renderToday() {
+  var cats = loadCats();
+  var counts = getTodayCounts();
+  var total = 0;
+  cats.forEach(function(c) {
+    total += (counts[c.id] || 0);
+  });
+
+  document.getElementById("totalCount").textContent = total;
+  document.getElementById("todayLabel").innerHTML = formatDateLabel(getTodayKey());
+
+  // Summary bar
+  var sb = document.getElementById("summaryBar");
+  sb.innerHTML = "";
+  cats.forEach(function(c) {
+    var n = counts[c.id] || 0;
+    if (n === 0) return;
+    var chip = document.createElement("div");
+    chip.className = "summary-chip";
+    chip.innerHTML = '<div class="summary-chip-dot" style="background:' + c.color + '"></div>' +
+      '<span class="summary-chip-label">' + c.name + '</span>' +
+      '<span class="summary-chip-count">' + n + '</span>';
+    sb.appendChild(chip);
+  });
+
+  // Grid
+  var grid = document.getElementById("categoriesGrid");
+  grid.innerHTML = "";
+  cats.forEach(function(c) {
+    var count = counts[c.id] || 0;
+    var card = document.createElement("div");
+    card.className = "category-card";
+    card.innerHTML =
+      '<button class="cat-tap-btn" onclick="increment(\'' + c.id + '\')">' +
+        '<div class="cat-color-bar" style="background:' + c.color + '"></div>' +
+        '<div class="cat-info">' +
+          '<div class="cat-name">' + c.name + '</div>' +
+          (c.desc ? '<div class="cat-desc">' + c.desc + '</div>' : '') +
+        '</div>' +
+      '</button>' +
+      '<div class="cat-count-area">' +
+        '<div class="cat-count" id="count-' + c.id + '">' + count + '</div>' +
+        '<button class="cat-minus-btn" onclick="decrement(\'' + c.id + '\')" title="Undo">&#8722;</button>' +
+      '</div>';
+    grid.appendChild(card);
+  });
+}
+
+function renderHistory() {
+  var data = loadData();
+  var cats = loadCats();
+  var keys = Object.keys(data).sort(function(a,b) { return b > a ? 1 : -1; });
+  var today = getTodayKey();
+
+  var list = document.getElementById("historyList");
+  list.innerHTML = "";
+
+  if (keys.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div><p>No history yet</p><small>Start tapping to log your first outreach</small></div>';
+    return;
+  }
+
+  keys.forEach(function(key, idx) {
+    var dayData = data[key];
+    var total = 0;
+    cats.forEach(function(c) { total += (dayData[c.id] || 0); });
+
+    // Also count any unknown cats
+    Object.keys(dayData).forEach(function(id) {
+      if (!cats.find(function(c) { return c.id === id; })) total += (dayData[id] || 0);
+    });
+
+    var label = key === today ? "Today" : formatDateLabel(key).replace(/<[^>]*>/g, "");
+    var isOpen = idx === 0;
+
+    var day = document.createElement("div");
+    day.className = "history-day";
+
+    var rows = "";
+    cats.forEach(function(c) {
+      var n = dayData[c.id] || 0;
+      if (n === 0) return;
+      rows += '<div class="history-row">' +
+        '<div class="history-cat-name"><div class="history-cat-dot" style="background:' + c.color + '"></div>' + c.name + '</div>' +
+        '<div class="history-cat-count">' + n + '</div>' +
+        '</div>';
+    });
+
+    if (!rows) rows = '<div style="font-size:13px;color:var(--text-muted);padding:8px 0;">No logged activity</div>';
+
+    day.innerHTML =
+      '<div class="history-day-header" onclick="toggleHistoryDay(this)">' +
+        '<div class="history-day-date">' + label + ' &mdash; ' + key + '</div>' +
+        '<div class="history-day-total">' + total + ' DMs</div>' +
+      '</div>' +
+      '<div class="history-day-body' + (isOpen ? " open" : "") + '">' + rows + '</div>';
+
+    list.appendChild(day);
+  });
+}
+
+function toggleHistoryDay(header) {
+  var body = header.nextElementSibling;
+  body.classList.toggle("open");
+}
+
+function renderManage() {
+  var cats = loadCats();
+  var list = document.getElementById("manageList");
+  list.innerHTML = "";
+
+  if (!cats.length) {
+    list.innerHTML = '<div class="empty-state"><p>No categories</p><small>Add one above</small></div>';
+    return;
+  }
+
+  cats.forEach(function(c) {
+    var item = document.createElement("div");
+    item.className = "manage-item";
+    item.innerHTML =
+      '<div class="manage-color" style="background:' + c.color + '"></div>' +
+      '<div class="manage-name">' + c.name + '</div>' +
+      '<div class="manage-desc-text">' + (c.desc || "") + '</div>' +
+      '<button class="btn-delete" onclick="deleteCategory(\'' + c.id + '\')" title="Delete">&#10005;</button>';
+    list.appendChild(item);
+  });
+}
+
+function renderColorPicker() {
+  var cp = document.getElementById("colorPicker");
+  cp.innerHTML = "";
+  var row = document.createElement("div");
+  row.style.cssText = "display:flex;gap:8px;flex-wrap:wrap;";
+  PALETTE.forEach(function(col) {
+    var dot = document.createElement("div");
+    dot.className = "color-dot" + (col === selectedColor ? " selected" : "");
+    dot.style.background = col;
+    dot.onclick = function() {
+      selectedColor = col;
+      renderColorPicker();
+    };
+    row.appendChild(dot);
+  });
+  cp.appendChild(row);
+}
+
+function toggleAddForm() {
+  var form = document.getElementById("addForm");
+  form.classList.toggle("open");
+  if (form.classList.contains("open")) {
+    document.getElementById("newCatName").focus();
+    renderColorPicker();
+  }
+}
+
+function confirmAddCategory() {
+  var name = document.getElementById("newCatName").value.trim();
+  if (!name) { showToast("Enter a category name"); return; }
+  var desc = document.getElementById("newCatDesc").value.trim();
+  var cats = loadCats();
+  var id = name.toLowerCase().replace(/[^a-z0-9]/g, "_") + "_" + Date.now();
+  cats.push({ id: id, name: name, desc: desc, color: selectedColor });
+  saveCats(cats);
+  document.getElementById("newCatName").value = "";
+  document.getElementById("newCatDesc").value = "";
+  selectedColor = PALETTE[0];
+  document.getElementById("addForm").classList.remove("open");
+  renderManage();
+  showToast("Category added");
+}
+
+function deleteCategory(id) {
+  var cats = loadCats().filter(function(c) { return c.id !== id; });
+  saveCats(cats);
+  renderManage();
+  showToast("Category removed");
+}
+
+function clearTodayData() {
+  if (!confirm("Clear today's counts? This can't be undone.")) return;
+  var data = loadData();
+  var key = getTodayKey();
+  delete data[key];
+  saveData(data);
+  renderToday();
+  showToast("Today cleared");
+}
+
+function clearAllHistory() {
+  if (!confirm("Delete ALL history? This cannot be undone.")) return;
+  localStorage.removeItem(STORAGE_KEY);
+  renderToday();
+  renderHistory();
+  showToast("History cleared");
+}
+
+function getWeekDays(offset) {
+  var now = new Date();
+  var dow = now.getDay();
+  var mondayOffset = (dow === 0) ? -6 : 1 - dow;
+  var monday = new Date(now);
+  monday.setDate(now.getDate() + mondayOffset + (offset * 7));
+  monday.setHours(0,0,0,0);
+  var days = [];
+  for (var i = 0; i < 7; i++) {
+    var d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    var y = d.getFullYear();
+    var m = String(d.getMonth()+1).padStart(2,"0");
+    var dd = String(d.getDate()).padStart(2,"0");
+    days.push(y + "-" + m + "-" + dd);
+  }
+  return days;
+}
+
+function getWeekLabel(days) {
+  var months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  var start = days[0].split("-");
+  var end = days[6].split("-");
+  var s = parseInt(start[2]) + " " + months[parseInt(start[1])-1];
+  var e = parseInt(end[2]) + " " + months[parseInt(end[1])-1] + " " + end[0];
+  return s + " &ndash; <span>" + e + "</span>";
+}
+
+function shiftWeek(dir) {
+  weekOffset += dir;
+  renderWeek();
+}
+
+function renderWeek() {
+  var days = getWeekDays(weekOffset);
+  var today = getTodayKey();
+  var data = loadData();
+  var cats = loadCats();
+  var dayNames = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+
+  document.getElementById("weekNavLabel").innerHTML = getWeekLabel(days);
+  var nextBtn = document.getElementById("weekNextBtn");
+  nextBtn.disabled = weekOffset >= 0;
+
+  // Calculate totals per category for the week
+  var catTotals = {};
+  cats.forEach(function(c) { catTotals[c.id] = 0; });
+  var grandTotal = 0;
+  var dayTotals = [];
+
+  days.forEach(function(key) {
+    var dayData = data[key] || {};
+    var dayTotal = 0;
+    cats.forEach(function(c) {
+      var n = dayData[c.id] || 0;
+      catTotals[c.id] += n;
+      dayTotal += n;
+      grandTotal += n;
+    });
+    dayTotals.push(dayTotal);
+  });
+
+  // Totals bar
+  var tb = document.getElementById("weekTotalsBar");
+  tb.innerHTML = "";
+  var hasAny = false;
+  cats.forEach(function(c) {
+    if (catTotals[c.id] === 0) return;
+    hasAny = true;
+    var chip = document.createElement("div");
+    chip.className = "week-total-chip";
+    chip.innerHTML =
+      '<div class="week-total-chip-dot" style="background:' + c.color + '"></div>' +
+      '<span class="week-total-chip-label">' + c.name + '</span>' +
+      '<span class="week-total-chip-count">' + catTotals[c.id] + '</span>';
+    tb.appendChild(chip);
+  });
+  if (!hasAny) {
+    tb.innerHTML = '<span style="font-size:13px;color:var(--text-muted);font-family:var(--font-body);">No activity this week yet</span>';
+  } else {
+    var gt = document.createElement("div");
+    gt.className = "week-grand-total";
+    gt.textContent = grandTotal + " total";
+    tb.appendChild(gt);
+  }
+
+  // Bar chart
+  var maxDay = Math.max.apply(null, dayTotals);
+  if (maxDay === 0) maxDay = 1;
+  var chart = document.getElementById("weekChart");
+  chart.innerHTML = "";
+
+  days.forEach(function(key, i) {
+    var dayData = data[key] || {};
+    var col = document.createElement("div");
+    col.className = "week-bar-col";
+
+    var totalEl = document.createElement("div");
+    totalEl.className = "week-bar-total" + (dayTotals[i] === 0 ? " zero" : "");
+    totalEl.textContent = dayTotals[i] > 0 ? dayTotals[i] : "";
+
+    var stack = document.createElement("div");
+    stack.className = "week-bar-stack";
+    var barHeightPx = Math.round((dayTotals[i] / maxDay) * 80);
+    if (barHeightPx < 3 && dayTotals[i] > 0) barHeightPx = 4;
+    stack.style.height = barHeightPx + "px";
+
+    cats.forEach(function(c) {
+      var n = dayData[c.id] || 0;
+      if (n === 0) return;
+      var seg = document.createElement("div");
+      seg.className = "week-bar-segment";
+      var segH = Math.round((n / dayTotals[i]) * barHeightPx);
+      if (segH < 2) segH = 2;
+      seg.style.height = segH + "px";
+      seg.style.background = c.color;
+      seg.title = c.name + ": " + n;
+      stack.appendChild(seg);
+    });
+
+    var lbl = document.createElement("div");
+    lbl.className = "week-bar-label" + (key === today ? " today-label" : "");
+    lbl.textContent = dayNames[i];
+
+    col.appendChild(totalEl);
+    col.appendChild(stack);
+    col.appendChild(lbl);
+    chart.appendChild(col);
+  });
+
+  // Day rows
+  var list = document.getElementById("weekDaysList");
+  list.innerHTML = "";
+  var fullDayNames = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+
+  days.forEach(function(key, i) {
+    var dayData = data[key] || {};
+    var total = dayTotals[i];
+    var isFuture = key > today;
+    var isToday = key === today;
+
+    var row = document.createElement("div");
+    row.className = "week-day-row";
+
+    var nameClass = "week-day-name" + (isToday ? " is-today" : "") + (isFuture ? " is-future" : "");
+
+    var miniChips = "";
+    cats.forEach(function(c) {
+      var n = dayData[c.id] || 0;
+      if (n === 0) return;
+      miniChips +=
+        '<div class="week-day-mini-chip">' +
+          '<div class="week-day-mini-dot" style="background:' + c.color + '"></div>' +
+          n +
+        '</div>';
+    });
+
+    var detailRows = "";
+    cats.forEach(function(c) {
+      var n = dayData[c.id] || 0;
+      if (n === 0) return;
+      detailRows +=
+        '<div class="week-day-detail-row">' +
+          '<div class="week-day-detail-name"><div class="week-day-detail-dot" style="background:' + c.color + '"></div>' + c.name + '</div>' +
+          '<div class="week-day-detail-count">' + n + '</div>' +
+        '</div>';
+    });
+
+    if (!detailRows) detailRows = '<div style="font-size:12px;color:var(--text-muted);padding:6px 0;">' + (isFuture ? "Future" : "Nothing logged") + '</div>';
+
+    row.innerHTML =
+      '<div class="week-day-header" onclick="toggleWeekDay(this)">' +
+        '<div class="' + nameClass + '">' + fullDayNames[i] + (isToday ? ' &mdash; Today' : '') + '</div>' +
+        '<div class="week-day-right">' +
+          '<div class="week-day-mini-chips">' + miniChips + '</div>' +
+          '<div class="week-day-total-num' + (total === 0 ? " zero" : "") + '">' + (total > 0 ? total : "&ndash;") + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="week-day-body">' + detailRows + '</div>';
+
+    list.appendChild(row);
+  });
+}
+
+function toggleWeekDay(header) {
+  var body = header.nextElementSibling;
+  body.classList.toggle("open");
+}
+
+function shiftMonth(dir) {
+  monthOffset += dir;
+  selectedMonthDay = null;
+  renderMonth();
+}
+
+function getMonthStart(offset) {
+  var now = new Date();
+  return new Date(now.getFullYear(), now.getMonth() + offset, 1);
+}
+
+function dateKey(y, m, d) {
+  return y + "-" + String(m+1).padStart(2,"0") + "-" + String(d).padStart(2,"0");
+}
+
+function renderMonth() {
+  var today = getTodayKey();
+  var data = loadData();
+  var cats = loadCats();
+  var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+  var start = getMonthStart(monthOffset);
+  var yr = start.getFullYear();
+  var mo = start.getMonth();
+  var daysInMonth = new Date(yr, mo + 1, 0).getDate();
+  var firstDow = start.getDay();
+  var leadingBlanks = (firstDow === 0) ? 6 : firstDow - 1;
+
+  document.getElementById("monthNavLabel").innerHTML = months[mo] + " <span>" + yr + "</span>";
+  var nextBtn = document.getElementById("monthNextBtn");
+  var nowDate = new Date();
+  nextBtn.disabled = (yr > nowDate.getFullYear()) || (yr === nowDate.getFullYear() && mo >= nowDate.getMonth());
+
+  // Build month totals
+  var catTotals = {};
+  cats.forEach(function(c) { catTotals[c.id] = 0; });
+  var grandTotal = 0;
+  var dayTotals = {};
+  var maxDayTotal = 0;
+
+  for (var d = 1; d <= daysInMonth; d++) {
+    var key = dateKey(yr, mo, d);
+    var dayData = data[key] || {};
+    var dt = 0;
+    cats.forEach(function(c) {
+      var n = dayData[c.id] || 0;
+      catTotals[c.id] += n;
+      dt += n;
+      grandTotal += n;
+    });
+    dayTotals[key] = dt;
+    if (dt > maxDayTotal) maxDayTotal = dt;
+  }
+
+  // Totals bar
+  var tb = document.getElementById("monthTotalsBar");
+  tb.innerHTML = "";
+  var hasAny = false;
+  cats.forEach(function(c) {
+    if (catTotals[c.id] === 0) return;
+    hasAny = true;
+    var chip = document.createElement("div");
+    chip.className = "month-total-chip";
+    chip.innerHTML =
+      '<div class="month-total-chip-dot" style="background:' + c.color + '"></div>' +
+      '<span class="month-total-chip-label">' + c.name + '</span>' +
+      '<span class="month-total-chip-count">' + catTotals[c.id] + '</span>';
+    tb.appendChild(chip);
+  });
+  if (!hasAny) {
+    tb.innerHTML = '<span style="font-size:13px;color:var(--text-muted);font-family:var(--font-body);">No activity this month yet</span>';
+  } else {
+    var gt = document.createElement("div");
+    gt.className = "month-grand-chip";
+    gt.textContent = grandTotal + " total";
+    tb.appendChild(gt);
+  }
+
+  // Grid
+  var grid = document.getElementById("monthGrid");
+  grid.innerHTML = "";
+
+  for (var b = 0; b < leadingBlanks; b++) {
+    var blank = document.createElement("div");
+    blank.className = "month-cell month-cell-empty";
+    grid.appendChild(blank);
+  }
+
+  var nowKey = today;
+
+  for (var d2 = 1; d2 <= daysInMonth; d2++) {
+    var k = dateKey(yr, mo, d2);
+    var dayData2 = data[k] || {};
+    var dt2 = dayTotals[k] || 0;
+    var isFuture = k > nowKey;
+    var isToday2 = k === nowKey;
+    var isSelected = k === selectedMonthDay;
+
+    var cell = document.createElement("div");
+    var cellClass = "month-cell";
+    if (isFuture) cellClass += " month-cell-future";
+    if (isToday2) cellClass += " month-cell-today";
+    cell.className = cellClass;
+
+    if (isSelected) cell.style.borderColor = "#c8c8c8";
+
+    var dateDiv = document.createElement("div");
+    dateDiv.className = "month-cell-date";
+    dateDiv.textContent = d2;
+
+    var totalDiv = document.createElement("div");
+    totalDiv.className = "month-cell-total" + (dt2 === 0 ? " zero" : "");
+    totalDiv.textContent = dt2 > 0 ? dt2 : "";
+
+    var dotsDiv = document.createElement("div");
+    dotsDiv.className = "month-cell-dots";
+    cats.forEach(function(c) {
+      var n = dayData2[c.id] || 0;
+      if (n === 0) return;
+      var dot = document.createElement("div");
+      dot.className = "month-cell-dot";
+      dot.style.background = c.color;
+      dotsDiv.appendChild(dot);
+    });
+
+    if (dt2 > 0 && maxDayTotal > 0) {
+      var heatBar = document.createElement("div");
+      heatBar.className = "month-heat-bar";
+      var pct = dt2 / maxDayTotal;
+      var r1 = 26, g1 = 26, b1 = 26;
+      var r2 = 155, g2 = 93, b2 = 229;
+      var r = Math.round(r1 + (r2 - r1) * pct);
+      var g = Math.round(g1 + (g2 - g1) * pct);
+      var bv = Math.round(b1 + (b2 - b1) * pct);
+      heatBar.style.background = "rgb(" + r + "," + g + "," + bv + ")";
+      cell.appendChild(heatBar);
+    }
+
+    cell.appendChild(dateDiv);
+    cell.appendChild(totalDiv);
+    cell.appendChild(dotsDiv);
+
+    if (!isFuture) {
+      (function(cellKey, cellDay) {
+        cell.onclick = function() { openMonthDetail(cellKey, cellDay); };
+      })(k, d2);
+    }
+
+    grid.appendChild(cell);
+  }
+
+  if (selectedMonthDay) {
+    openMonthDetail(selectedMonthDay, parseInt(selectedMonthDay.split("-")[2]));
+  } else {
+    document.getElementById("monthDetailPanel").classList.remove("open");
+  }
+}
+
+function openMonthDetail(key, dayNum) {
+  selectedMonthDay = key;
+  var data = loadData();
+  var cats = loadCats();
+  var dayData = data[key] || {};
+  var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  var parts = key.split("-");
+  var mo = parseInt(parts[1]) - 1;
+  var daysOfWeek = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  var d = new Date(parseInt(parts[0]), mo, parseInt(parts[2]));
+  var label = daysOfWeek[d.getDay()] + " " + dayNum + " " + months[mo];
+
+  var total = 0;
+  cats.forEach(function(c) { total += (dayData[c.id] || 0); });
+
+  document.getElementById("monthDetailDate").textContent = label;
+  document.getElementById("monthDetailTotal").textContent = total + " DMs";
+
+  var rows = document.getElementById("monthDetailRows");
+  rows.innerHTML = "";
+
+  var hasAny = false;
+  cats.forEach(function(c) {
+    var n = dayData[c.id] || 0;
+    if (n === 0) return;
+    hasAny = true;
+    var row = document.createElement("div");
+    row.className = "month-detail-row";
+    row.innerHTML =
+      '<div class="month-detail-name"><div class="month-detail-dot" style="background:' + c.color + '"></div>' + c.name + '</div>' +
+      '<div class="month-detail-count">' + n + '</div>';
+    rows.appendChild(row);
+  });
+
+  if (!hasAny) {
+    rows.innerHTML = '<div style="font-size:13px;color:var(--text-muted);padding:8px 0;">Nothing logged this day</div>';
+  }
+
+  document.getElementById("monthDetailPanel").classList.add("open");
+
+  // Re-highlight selected cell
+  var allCells = document.querySelectorAll(".month-cell:not(.month-cell-empty)");
+  allCells.forEach(function(cell) {
+    cell.style.borderColor = "";
+  });
+  // Find and highlight
+  var grid = document.getElementById("monthGrid");
+  var cells = grid.querySelectorAll(".month-cell:not(.month-cell-empty)");
+  var start = getMonthStart(monthOffset);
+  var mo2 = start.getMonth();
+  var yr2 = start.getFullYear();
+  var firstDow = start.getDay();
+  var leadingBlanks = (firstDow === 0) ? 6 : firstDow - 1;
+  var idx = dayNum - 1;
+  var cellEl = cells[idx];
+  if (cellEl) cellEl.style.borderColor = "var(--silver)";
+}
+
+function closeMonthDetail() {
+  selectedMonthDay = null;
+  document.getElementById("monthDetailPanel").classList.remove("open");
+  var cells = document.querySelectorAll(".month-cell:not(.month-cell-empty):not(.month-cell-today)");
+  cells.forEach(function(cell) { cell.style.borderColor = ""; });
+}
+
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll(".screen").forEach(function(s) { s.classList.remove("active"); });
+  document.querySelectorAll(".nav-tab").forEach(function(t) { t.classList.remove("active"); });
+  document.getElementById("screen-" + tab).classList.add("active");
+  var tabs = document.querySelectorAll(".nav-tab");
+  var map = { today: 0, week: 1, month: 2, history: 3, manage: 4 };
+  tabs[map[tab]].classList.add("active");
+
+  if (tab === "week") renderWeek();
+  if (tab === "month") renderMonth();
+  if (tab === "history") renderHistory();
+  if (tab === "manage") { renderManage(); renderColorPicker(); }
+}
+
+function showToast(msg) {
+  var t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(function() { t.classList.remove("show"); }, 2000);
+}
+
+// INIT
+renderToday();
+renderColorPicker();
+</script>
+</body>
+</html>
