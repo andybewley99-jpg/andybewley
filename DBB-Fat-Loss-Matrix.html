@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fat Loss Matrix — Dream Body Blueprint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#cc0000;--red-dark:#990000;--red-dim:rgba(204,0,0,0.12);
+  --bg:#0d0d0d;--bg1:#111111;--bg2:#161616;--bg3:#1e1e1e;--bg4:#242424;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);--border3:rgba(255,255,255,0.18);
+  --text:#efefef;--muted:#888;--dim:#444;--silver:#aaa;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* BG */
+.bg-wrap{position:fixed;inset:0;pointer-events:none;z-index:0}
+.bg-grid{
+  position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,0.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.022) 1px,transparent 1px);
+  background-size:64px 64px;
+}
+.bg-glow1{position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:900px;height:600px;background:radial-gradient(ellipse,rgba(204,0,0,0.07) 0%,transparent 65%)}
+.bg-glow2{position:absolute;bottom:-100px;right:-100px;width:500px;height:500px;background:radial-gradient(circle,rgba(204,0,0,0.04) 0%,transparent 70%)}
+.bg-scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.03) 3px,rgba(0,0,0,0.03) 4px);pointer-events:none}
+
+/* PAGE */
+.page{position:relative;z-index:1;max-width:700px;margin:0 auto;padding:64px 24px 120px}
+
+/* HEADER */
+.header{display:flex;align-items:center;gap:14px;margin-bottom:64px;opacity:0;animation:slideUp .5s .05s ease forwards}
+.logo{width:44px;height:44px;background:var(--red);display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0}
+.logo::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,100,100,0.3),transparent)}
+.logo span{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:12px;letter-spacing:1px;color:#fff;position:relative;z-index:1}
+.heyebrow{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:3px}
+.htitle{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:var(--text);line-height:1}
+
+/* HERO */
+.hero{margin-bottom:52px;opacity:0;animation:slideUp .5s .12s ease forwards}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;background:var(--red-dim);border:1px solid rgba(204,0,0,0.25);padding:5px 12px;margin-bottom:20px}
+.hero-tag span{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--red)}
+.hero-dot{width:5px;height:5px;border-radius:50%;background:var(--red);animation:pulse 1.8s ease infinite}
+.hero h1{font-family:'Barlow Condensed',sans-serif;font-size:clamp(52px,11vw,88px);font-weight:900;line-height:.9;letter-spacing:-1px;text-transform:uppercase;margin-bottom:18px}
+.hero h1 .line2{color:var(--red);display:block}
+.hero p{font-size:15px;color:var(--muted);line-height:1.75;max-width:460px}
+
+/* STEP NAV */
+.step-nav{display:flex;gap:0;margin-bottom:36px;border:1px solid var(--border);border-radius:16px;overflow:hidden;opacity:0;animation:slideUp .5s .2s ease forwards}
+.step-item{flex:1;display:flex;align-items:center;gap:10px;padding:13px 16px;cursor:pointer;border-right:1px solid var(--border);background:var(--bg1);transition:background .2s;position:relative;user-select:none}
+.step-item:last-child{border-right:none}
+.step-item:hover{background:var(--bg2)}
+.step-item.active{background:var(--bg2)}
+.step-item.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--red)}
+.step-n{width:22px;height:22px;border:1px solid var(--border2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--dim);flex-shrink:0;transition:all .2s}
+.step-item.active .step-n{border-color:var(--red);color:var(--red)}
+.step-item.done .step-n{border-color:rgba(204,0,0,0.3);color:var(--red);background:var(--red-dim)}
+.step-item.done .step-n::before{content:'✓';font-size:11px}
+.step-item.done .step-n span{display:none}
+.step-lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--dim);transition:color .2s}
+.step-item.active .step-lbl,.step-item.done .step-lbl{color:var(--muted)}
+
+/* SCREENS */
+.screen{display:none}
+.screen.active{display:block;animation:fadeIn .3s ease forwards}
+
+/* CARD */
+.card{border:1px solid var(--border);background:var(--bg1);margin-bottom:12px;position:relative;overflow:hidden;border-radius:20px}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,var(--red),transparent 60%);opacity:.6}
+.card-head{padding:22px 24px 0;display:flex;align-items:flex-start;gap:14px;margin-bottom:18px}
+.card-badge{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--red);background:var(--red-dim);border:1px solid rgba(204,0,0,0.2);padding:3px 10px;border-radius:20px;flex-shrink:0;margin-top:3px}
+.card-head-text h3{font-family:'Barlow Condensed',sans-serif;font-size:21px;font-weight:800;color:var(--text);line-height:1.1;margin-bottom:3px}
+.card-head-text p{font-size:13px;color:var(--muted);line-height:1.5}
+.card-body{padding:0 24px 24px}
+
+/* FIELDS */
+.fg{margin-bottom:16px}
+.fg:last-child{margin-bottom:0}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.flabel{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--dim);margin-bottom:6px;display:block;transition:color .2s}
+.iw{display:flex;align-items:center;border:1px solid var(--border2);background:var(--bg);border-radius:12px;overflow:hidden;transition:border-color .25s,box-shadow .25s}
+.iw:focus-within{border-color:var(--red);box-shadow:0 0 0 3px rgba(204,0,0,0.1)}
+.iw:focus-within ~ .flabel,.iw:focus-within + .flabel{color:var(--red)}
+.ipfx{padding:0 11px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;color:var(--dim);border-right:1px solid var(--border);height:44px;display:flex;align-items:center;background:var(--bg2);text-transform:uppercase;white-space:nowrap;flex-shrink:0}
+.iw input{flex:1;border:none;outline:none;background:transparent;padding:0 13px;font-size:15px;font-weight:500;color:var(--text);height:44px;font-family:'DM Sans',sans-serif;width:100%;min-width:0}
+.iw input::placeholder{color:var(--dim)}
+select{display:none}
+.hint{font-size:12px;color:var(--dim);margin-top:6px;line-height:1.55}
+
+/* CUSTOM PICKERS */
+.pick-2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pick-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.pick-5{display:flex;flex-direction:column;gap:6px}
+.pick-btn{
+  display:flex;align-items:center;gap:10px;
+  padding:11px 14px;
+  border:1px solid var(--border2);border-radius:12px;
+  background:var(--bg2);cursor:pointer;
+  transition:border-color .18s,background .18s;
+  text-align:left;width:100%;
+}
+.pick-btn:hover{border-color:var(--border3);background:var(--bg3)}
+.pick-btn.selected{border-color:var(--red);background:rgba(204,0,0,0.08)}
+.pick-btn.selected .pb-dot{background:var(--red);border-color:var(--red)}
+.pick-btn.selected .pb-dot::after{opacity:1}
+.pick-btn.selected .pb-main{color:var(--text)}
+.pb-dot{
+  width:16px;height:16px;border-radius:50%;
+  border:1.5px solid var(--dim);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .18s;
+}
+.pb-dot::after{
+  content:'';width:6px;height:6px;border-radius:50%;
+  background:#fff;opacity:0;transition:opacity .18s;
+}
+.pb-text{flex:1;min-width:0}
+.pb-main{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--muted);letter-spacing:.3px;line-height:1.2;transition:color .18s}
+.pb-sub{font-size:11px;color:var(--dim);margin-top:2px;line-height:1.3}
+.pb-tag{
+  flex-shrink:0;font-family:'Barlow Condensed',sans-serif;
+  font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  padding:2px 8px;border-radius:20px;
+  background:var(--bg3);color:var(--dim);
+  transition:all .18s;
+}
+.pick-btn.selected .pb-tag{background:rgba(204,0,0,0.15);color:var(--red)}
+
+/* UNIT TOGGLE */
+.unit-toggle{display:inline-flex;border:1px solid var(--border2);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.ut-btn{padding:6px 14px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--dim);background:transparent;border:none;cursor:pointer;transition:all .2s}
+.ut-btn.active{background:var(--red);color:#fff}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--border);margin:18px 0}
+
+/* CALC ROWS */
+.calc-row{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;margin-top:8px;transition:background .2s}
+.calc-row:hover{background:var(--bg3)}
+.calc-lbl{font-size:13px;color:var(--muted)}
+.calc-val{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;color:var(--text);letter-spacing:.3px}
+.calc-val.red{color:var(--red)}
+
+/* BUTTONS */
+.btn-row{display:flex;gap:10px;margin-top:16px}
+.btn{height:50px;border:1px solid var(--border2);border-radius:12px;background:transparent;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;padding:0 22px;transition:all .2s;white-space:nowrap}
+.btn:hover{border-color:var(--border3);color:var(--text)}
+.btn-primary{flex:1;background:var(--red);border-color:var(--red);color:#fff;position:relative;overflow:hidden}
+.btn-primary::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,90,90,0.2),transparent)}
+.btn-primary:hover{background:var(--red-dark);border-color:var(--red-dark)}
+.btn-primary span{position:relative;z-index:1}
+
+/* RESULTS HERO */
+.r-hero{background:var(--bg1);border:1px solid var(--border);border-radius:20px;padding:52px 40px 44px;text-align:center;position:relative;overflow:hidden;margin-bottom:12px}
+.r-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent)}
+.r-hero::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:500px;height:500px;background:radial-gradient(circle,rgba(204,0,0,0.06) 0%,transparent 65%);pointer-events:none}
+.r-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:14px}
+.r-number{font-family:'Barlow Condensed',sans-serif;font-size:clamp(90px,22vw,130px);font-weight:900;color:var(--text);line-height:.85;letter-spacing:-3px;position:relative;z-index:1;transition:opacity .3s}
+.r-unit{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-top:10px;position:relative;z-index:1}
+.r-sub{font-size:14px;color:var(--muted);margin-top:14px;position:relative;z-index:1;line-height:1.65;max-width:400px;margin-left:auto;margin-right:auto}
+
+/* PROTEIN CALLOUT */
+.protein-row{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,rgba(204,0,0,0.08),rgba(204,0,0,0.03));border:1px solid rgba(204,0,0,0.2);border-radius:16px;padding:16px 20px;margin-bottom:12px;position:relative;overflow:hidden}
+.protein-row::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--red);border-radius:3px 0 0 3px}
+.protein-left .pl{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin-bottom:4px}
+.protein-left .pv{font-size:13px;color:var(--muted);line-height:1.5}
+.protein-num{font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;color:var(--text);white-space:nowrap}
+.protein-num span{font-size:14px;font-weight:400;color:var(--muted);font-family:'DM Sans',sans-serif;display:block;text-align:right;margin-top:2px;letter-spacing:.3px}
+
+/* WEEKS HERO */
+.weeks-hero{border:1px solid rgba(204,0,0,0.4);border-radius:20px;background:var(--bg1);padding:28px 24px;text-align:center;margin-bottom:12px;position:relative;overflow:hidden}
+.weeks-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent)}
+.weeks-hero::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(204,0,0,0.05),transparent 70%);pointer-events:none}
+.weeks-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:8px;position:relative;z-index:1}
+.weeks-number{font-family:'Barlow Condensed',sans-serif;font-size:clamp(72px,18vw,108px);font-weight:900;color:var(--text);line-height:.9;letter-spacing:-2px;position:relative;z-index:1}
+.weeks-unit{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-top:6px;position:relative;z-index:1}
+.weeks-date{font-size:13px;color:var(--red);margin-top:10px;position:relative;z-index:1;font-weight:500;letter-spacing:.3px}
+
+/* METRICS */
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.mbox{background:var(--bg1);border:1px solid var(--border);border-radius:14px;padding:16px 14px;text-align:center}
+.mlbl{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);margin-bottom:5px}
+.mval{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;color:var(--text);line-height:1}
+
+/* PROGRESS */
+.prog-section{background:var(--bg1);border:1px solid var(--border);border-radius:16px;padding:22px 24px;margin-bottom:12px}
+.prog-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.prog-title{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim)}
+.prog-pct{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;color:var(--red)}
+.prog-track{height:6px;background:var(--bg3);border-radius:3px;position:relative;margin-bottom:10px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--red-dark),var(--red));width:0%;transition:width .9s cubic-bezier(.25,.46,.45,.94);border-radius:3px;position:relative}
+.prog-fill::after{content:'';position:absolute;right:0;top:50%;transform:translateY(-50%);width:10px;height:10px;background:var(--red);border-radius:50%;box-shadow:0 0 8px rgba(204,0,0,.6)}
+.prog-lbls{display:flex;justify-content:space-between;font-size:12px;color:var(--dim)}
+
+/* VERDICT */
+.verdict{border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:8px;position:relative;overflow:hidden}
+.verdict + .verdict{margin-top:8px}
+.verdict.good{border-left:3px solid #22c55e}
+.verdict.caution{border-left:3px solid #f59e0b}
+.verdict.bad{border-left:3px solid var(--red)}
+.vtag{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px}
+.verdict.good .vtag{color:#22c55e}
+.verdict.caution .vtag{color:#f59e0b}
+.verdict.bad .vtag{color:var(--red)}
+.vtext{font-size:13px;color:var(--muted);line-height:1.65}
+
+/* LEVERS */
+.levers{border:1px solid var(--border);border-radius:20px;background:var(--bg1);overflow:hidden;margin-bottom:12px}
+.levers-head{padding:16px 24px;border-bottom:1px solid var(--border);font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--dim)}
+.lever{display:flex;gap:0;border-bottom:1px solid var(--border);transition:background .15s}
+.lever:last-child{border-bottom:none}
+.lever:hover{background:var(--bg2)}
+.lever-n{width:54px;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;color:var(--bg4);border-right:1px solid var(--border);flex-shrink:0;letter-spacing:-1px}
+.lever-c{padding:18px 20px}
+.lever-t{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;color:var(--text);margin-bottom:3px;letter-spacing:.3px}
+.lever-d{font-size:13px;color:var(--muted);line-height:1.55}
+
+/* CTA */
+.cta-block{border:1px solid rgba(204,0,0,0.35);border-radius:20px;padding:36px 32px;text-align:center;position:relative;overflow:hidden;background:var(--bg1)}
+.cta-block::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent)}
+.cta-block::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center top,rgba(204,0,0,0.07),transparent 60%);pointer-events:none}
+.cta-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:12px;position:relative;z-index:1}
+.cta-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(28px,5vw,38px);font-weight:900;text-transform:uppercase;color:var(--text);line-height:.95;margin-bottom:10px;position:relative;z-index:1}
+.cta-body{font-size:14px;color:var(--muted);line-height:1.7;max-width:380px;margin:0 auto 24px;position:relative;z-index:1}
+.cta-body.aggressive{color:var(--silver)}
+.cta-btn{display:inline-flex;align-items:center;gap:10px;height:54px;padding:0 32px;background:var(--red);border:none;border-radius:12px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:background .2s;position:relative;overflow:hidden}
+.cta-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,90,90,.2),transparent)}
+.cta-btn:hover{background:var(--red-dark)}
+.cta-arrow{font-size:18px;transition:transform .2s}
+.cta-btn:hover .cta-arrow{transform:translateX(4px)}
+
+/* FOOTER */
+.footer{text-align:center;padding-top:52px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--dim)}
+.footer span{color:var(--red)}
+
+/* ANIMATIONS */
+@keyframes slideUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes countUp{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
+
+.shimmer-wrap{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.shimmer-line{position:absolute;top:0;bottom:0;width:40%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.04),transparent);transform:translateX(-100%);animation:shimmer 3s 1s ease-in-out infinite}
+
+/* RESPONSIVE */
+@media(max-width:520px){
+  .page{padding:36px 16px 60px}
+  .fr{grid-template-columns:1fr}
+  .metrics{grid-template-columns:1fr 1fr 1fr}
+  .r-hero{padding:36px 20px}
+  .step-lbl{display:none}
+  .step-item{justify-content:center}
+  .cta-block{padding:28px 20px}
+  .protein-row{flex-direction:column;gap:10px;text-align:center}
+  .protein-row::before{width:100%;height:2px;bottom:auto}
+  .protein-num span{text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-wrap">
+  <div class="bg-grid"></div>
+  <div class="bg-glow1"></div>
+  <div class="bg-glow2"></div>
+  <div class="bg-scan"></div>
+</div>
+
+<div class="page">
+
+  <div class="header">
+    <div class="logo"><span>DBB</span></div>
+    <div>
+      <div class="heyebrow">Dream Body Blueprint</div>
+      <div class="htitle">Fat Loss Matrix</div>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="hero-tag">
+      <div class="hero-dot"></div>
+      <span>Free tool — no sign-up needed</span>
+    </div>
+    <h1>Three inputs.<br><span class="line2">One number.</span></h1>
+    <p>Fill in your details. We'll calculate your maintenance calories, work out exactly what deficit you need, and hand you the single daily target that drives your fat loss.</p>
+  </div>
+
+  <div class="step-nav" id="stepNav">
+    <div class="step-item active" id="pill-1" onclick="goTo(1)">
+      <div class="step-n"><span>01</span></div>
+      <div class="step-lbl">Your body</div>
+    </div>
+    <div class="step-item" id="pill-2" onclick="goTo(2)">
+      <div class="step-n"><span>02</span></div>
+      <div class="step-lbl">Your goal</div>
+    </div>
+    <div class="step-item" id="pill-3" onclick="goTo(3)">
+      <div class="step-n"><span>03</span></div>
+      <div class="step-lbl">Your number</div>
+    </div>
+  </div>
+
+  <!-- SCREEN 1 -->
+  <div class="screen active" id="screen-1">
+    <div class="card">
+      <div class="shimmer-wrap"><div class="shimmer-line"></div></div>
+      <div class="card-head">
+        <div class="card-badge">01</div>
+        <div class="card-head-text">
+          <h3>Your body right now</h3>
+          <p>Accurate inputs = accurate number. Be honest — nobody's watching.</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="fg" style="margin-bottom:14px">
+          <label class="flabel">Units</label>
+          <div class="unit-toggle">
+            <button class="ut-btn active" id="btn-kg" onclick="setUnit('metric')">KG / CM</button>
+            <button class="ut-btn" id="btn-st" onclick="setUnit('imperial')">LBS / IN</button>
+          </div>
+        </div>
+
+        <div class="fg fr">
+          <div>
+            <label class="flabel">Age</label>
+            <div class="iw"><input type="number" id="age" value="35" min="16" max="80" oninput="calc()"></div>
+          </div>
+          <div>
+            <label class="flabel">Sex</label>
+            <select id="sex" onchange="calc()">
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+            <div class="pick-2" id="pick-sex">
+              <button class="pick-btn selected" onclick="setPick('sex','male')" data-val="male">
+                <div class="pb-dot"></div>
+                <div class="pb-text"><div class="pb-main">Male</div></div>
+              </button>
+              <button class="pick-btn" onclick="setPick('sex','female')" data-val="female">
+                <div class="pb-dot"></div>
+                <div class="pb-text"><div class="pb-main">Female</div></div>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="fg fr">
+          <div>
+            <label class="flabel" id="wlabel">Current weight</label>
+            <div class="iw">
+              <div class="ipfx" id="wpfx">KG</div>
+              <input type="number" id="weight" value="90" min="1" max="500" step="0.1" oninput="calc()">
+            </div>
+          </div>
+          <div>
+            <label class="flabel" id="hlabel">Height</label>
+            <div class="iw">
+              <div class="ipfx" id="hpfx">CM</div>
+              <input type="number" id="height" value="175" min="1" max="300" oninput="calc()">
+            </div>
+          </div>
+        </div>
+
+        <div class="fg">
+          <label class="flabel">Activity level</label>
+          <select id="activity" onchange="calc()">
+            <option value="1.2">Under 6,000 steps/day — mostly sedentary</option>
+            <option value="1.375" selected>6,000–9,000 steps/day — light daily movement</option>
+            <option value="1.55">9,000–11,500 steps/day — moderately active</option>
+            <option value="1.725">11,500–15,000 steps/day — consistently active</option>
+            <option value="1.9">15,000+ steps/day — very active or physical job</option>
+          </select>
+          <div class="pick-5" id="pick-activity">
+            <button class="pick-btn" onclick="setPick('activity','1.2')" data-val="1.2">
+              <div class="pb-dot"></div>
+              <div class="pb-text">
+                <div class="pb-main">Mostly sedentary</div>
+                <div class="pb-sub">Under 6,000 steps/day</div>
+              </div>
+              <div class="pb-tag">Slow burn</div>
+            </button>
+            <button class="pick-btn selected" onclick="setPick('activity','1.375')" data-val="1.375">
+              <div class="pb-dot"></div>
+              <div class="pb-text">
+                <div class="pb-main">Light daily movement</div>
+                <div class="pb-sub">6,000–9,000 steps/day</div>
+              </div>
+              <div class="pb-tag">Steady</div>
+            </button>
+            <button class="pick-btn" onclick="setPick('activity','1.55')" data-val="1.55">
+              <div class="pb-dot"></div>
+              <div class="pb-text">
+                <div class="pb-main">Moderately active</div>
+                <div class="pb-sub">9,000–11,500 steps/day</div>
+              </div>
+              <div class="pb-tag">Good pace</div>
+            </button>
+            <button class="pick-btn" onclick="setPick('activity','1.725')" data-val="1.725">
+              <div class="pb-dot"></div>
+              <div class="pb-text">
+                <div class="pb-main">Consistently active</div>
+                <div class="pb-sub">11,500–15,000 steps/day</div>
+              </div>
+              <div class="pb-tag">Solid burn</div>
+            </button>
+            <button class="pick-btn" onclick="setPick('activity','1.9')" data-val="1.9">
+              <div class="pb-dot"></div>
+              <div class="pb-text">
+                <div class="pb-main">Very active or physical job</div>
+                <div class="pb-sub">15,000+ steps/day</div>
+              </div>
+              <div class="pb-tag">High output</div>
+            </button>
+          </div>
+          <p class="hint">Check your phone's health app for your daily average. Be honest — your number depends on it.</p>
+        </div>
+
+        <div class="divider"></div>
+        <div class="calc-row">
+          <div class="calc-lbl">Your maintenance calories (TDEE)</div>
+          <div class="calc-val red" id="tdee-disp">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goTo(2)"><span>Next — set your goal &rarr;</span></button>
+    </div>
+  </div>
+
+  <!-- SCREEN 2 -->
+  <div class="screen" id="screen-2">
+    <div class="card">
+      <div class="shimmer-wrap"><div class="shimmer-line"></div></div>
+      <div class="card-head">
+        <div class="card-badge">02</div>
+        <div class="card-head-text">
+          <h3>Your goal</h3>
+          <p>Where are you going, and how long are we working with?</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="fg fr">
+          <div>
+            <label class="flabel" id="gwlabel">Goal weight</label>
+            <div class="iw">
+              <div class="ipfx" id="gwpfx">KG</div>
+              <input type="number" id="goal-weight" value="80" min="1" max="500" step="0.1" oninput="calc()">
+            </div>
+          </div>
+          <div id="weeks-input-wrap">
+            <label class="flabel">Timeframe</label>
+            <div class="iw">
+              <div class="ipfx">WKS</div>
+              <input type="number" id="weeks" value="16" min="4" max="52" oninput="calc()">
+            </div>
+          </div>
+        </div>
+        <p class="hint" id="weeks-hint" style="margin-top:-8px;margin-bottom:16px">DBB minimum is 16 weeks. Real transformation takes real time.</p>
+
+        <div class="fg">
+          <label class="flabel">Deficit approach</label>
+          <select id="deficit-pref" onchange="calc()">
+            <option value="auto" selected>Auto — work it out from my goal and timeframe</option>
+            <option value="moderate">Moderate — 500 kcal/day (steady, sustainable)</option>
+            <option value="aggressive">Aggressive — 750 kcal/day (faster, harder)</option>
+          </select>
+          <div class="pick-3" id="pick-deficit">
+            <button class="pick-btn selected" onclick="setPick('deficit-pref','auto')" data-val="auto">
+              <div class="pb-dot"></div>
+              <div class="pb-text">
+                <div class="pb-main">Auto</div>
+                <div class="pb-sub">From my goal + timeframe</div>
+              </div>
+            </button>
+            <button class="pick-btn" onclick="setPick('deficit-pref','moderate')" data-val="moderate">
+              <div class="pb-dot"></div>
+              <div class="pb-text">
+                <div class="pb-main">Moderate</div>
+                <div class="pb-sub">500 kcal/day — steady</div>
+              </div>
+            </button>
+            <button class="pick-btn" onclick="setPick('deficit-pref','aggressive')" data-val="aggressive">
+              <div class="pb-dot"></div>
+              <div class="pb-text">
+                <div class="pb-main">Aggressive</div>
+                <div class="pb-sub">750 kcal/day — faster</div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="calc-row">
+          <div class="calc-lbl">Total weight to lose</div>
+          <div class="calc-val" id="total-disp">—</div>
+        </div>
+        <div class="calc-row" style="margin-top:6px">
+          <div class="calc-lbl">Required weekly loss</div>
+          <div class="calc-val" id="weekly-disp">—</div>
+        </div>
+        <div class="calc-row" style="margin-top:6px">
+          <div class="calc-lbl">Daily calorie deficit</div>
+          <div class="calc-val red" id="deficit-disp">—</div>
+        </div>
+        <div class="calc-row" id="timeline-row" style="margin-top:6px;display:none">
+          <div class="calc-lbl">Estimated time to goal</div>
+          <div class="calc-val red" id="timeline-disp">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="goTo(1)">&larr; Back</button>
+      <button class="btn btn-primary" onclick="goTo(3)"><span>Show me my number &rarr;</span></button>
+    </div>
+  </div>
+
+  <!-- SCREEN 3 -->
+  <div class="screen" id="screen-3">
+    <div class="r-hero">
+      <div class="r-eyebrow">Your daily calorie target</div>
+      <div class="r-number" id="r-cal">—</div>
+      <div class="r-unit">kcal per day</div>
+      <div class="r-sub" id="r-sub">Hit this number consistently and the rest takes care of itself.</div>
+    </div>
+
+    <div class="protein-row" id="protein-row">
+      <div class="protein-left">
+        <div class="pl">Daily protein target</div>
+        <div class="pv" id="protein-sub">Based on your goal weight</div>
+      </div>
+      <div class="protein-num" id="protein-num">—<span>grams per day</span></div>
+    </div>
+
+    <div class="weeks-hero">
+      <div class="weeks-eyebrow">Your timeline to goal</div>
+      <div class="weeks-number"><span id="r-wks">—</span></div>
+      <div class="weeks-unit">weeks</div>
+      <div class="weeks-date" id="r-date"></div>
+    </div>
+
+    <div class="metrics">
+      <div class="mbox"><div class="mlbl">Maintenance</div><div class="mval" id="r-tdee">—</div></div>
+      <div class="mbox"><div class="mlbl">Daily deficit</div><div class="mval" id="r-def">—</div></div>
+      <div class="mbox"><div class="mlbl">Weekly loss</div><div class="mval" id="r-wk">—</div></div>
+    </div>
+
+    <div class="prog-section">
+      <div class="prog-top">
+        <div class="prog-title">Your weight journey</div>
+        <div class="prog-pct" id="r-pct"></div>
+      </div>
+      <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+      <div class="prog-lbls">
+        <span id="r-sw">—</span>
+        <span style="color:var(--red);font-weight:500" id="r-gw">—</span>
+      </div>
+    </div>
+
+    <div id="verdict-area"></div>
+
+    <div class="levers">
+      <div class="levers-head">The 3 levers that move the needle</div>
+      <div class="lever">
+        <div class="lever-n">01</div>
+        <div class="lever-c">
+          <div class="lever-t">Hit your calorie target</div>
+          <div class="lever-d">Your number above is the only metric that matters most days. Track it, hit it, repeat. Everything else flows from this.</div>
+        </div>
+      </div>
+      <div class="lever">
+        <div class="lever-n">02</div>
+        <div class="lever-c">
+          <div class="lever-t">Protect your muscle with protein</div>
+          <div class="lever-d" id="lever2-d">Aim for your protein target daily. Keeps you full, preserves muscle, stops the body eating itself.</div>
+        </div>
+      </div>
+      <div class="lever">
+        <div class="lever-n">03</div>
+        <div class="lever-c">
+          <div class="lever-t">Stack your steps</div>
+          <div class="lever-d">8,000–10,000 steps per day is free calorie burn. It accelerates your deficit without wrecking your recovery or gym performance.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-block" id="cta-block">
+      <div class="cta-eyebrow">Dream Body Blueprint</div>
+      <div class="cta-title" id="cta-title">Ready to make<br>this real?</div>
+      <div class="cta-body" id="cta-body">You've got your number. Now you need the system, the accountability, and a coach who's been exactly where you are.</div>
+      <a href="https://form.typeform.com/to/HfeyEhYy" target="_blank" rel="noopener" class="cta-btn">
+        Get help with this goal <span class="cta-arrow">&rarr;</span>
+      </a>
+    </div>
+
+    <div class="btn-row" style="margin-top:16px">
+      <button class="btn" onclick="goTo(2)">&larr; Recalculate</button>
+    </div>
+  </div>
+
+  <div class="footer">Dream Body Blueprint &nbsp;&mdash;&nbsp; <span>Free Tool</span></div>
+</div>
+
+<script>
+var unit = 'metric';
+
+function setPick(fieldId, val) {
+  var sel = document.getElementById(fieldId);
+  sel.value = val;
+  var pickId = fieldId === 'activity' ? 'pick-activity' : fieldId === 'sex' ? 'pick-sex' : 'pick-deficit';
+  var container = document.getElementById(pickId);
+  var btns = container.querySelectorAll('.pick-btn');
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].classList.toggle('selected', btns[i].getAttribute('data-val') === val);
+  }
+  calc();
+}
+
+function setUnit(u) {
+  unit = u;
+  document.getElementById('btn-kg').classList.toggle('active', u === 'metric');
+  document.getElementById('btn-st').classList.toggle('active', u === 'imperial');
+
+  var wEl = document.getElementById('weight');
+  var hEl = document.getElementById('height');
+  var gwEl = document.getElementById('goal-weight');
+
+  if (u === 'imperial') {
+    document.getElementById('wpfx').textContent = 'LBS';
+    document.getElementById('hpfx').textContent = 'IN';
+    document.getElementById('gwpfx').textContent = 'LBS';
+    document.getElementById('wlabel').textContent = 'Current weight';
+    document.getElementById('hlabel').textContent = 'Height';
+    document.getElementById('gwlabel').textContent = 'Goal weight';
+    var wKg = parseFloat(wEl.value) || 90;
+    var hCm = parseFloat(hEl.value) || 175;
+    var gwKg = parseFloat(gwEl.value) || 80;
+    wEl.value = Math.round(wKg * 2.20462);
+    hEl.value = Math.round(hCm / 2.54);
+    gwEl.value = Math.round(gwKg * 2.20462);
+    wEl.setAttribute('placeholder', 'e.g. 198');
+    hEl.setAttribute('placeholder', 'e.g. 69');
+  } else {
+    document.getElementById('wpfx').textContent = 'KG';
+    document.getElementById('hpfx').textContent = 'CM';
+    document.getElementById('gwpfx').textContent = 'KG';
+    var wLbs = parseFloat(wEl.value) || 198;
+    var hIn = parseFloat(hEl.value) || 69;
+    var gwLbs = parseFloat(gwEl.value) || 176;
+    wEl.value = Math.round(wLbs / 2.20462 * 10) / 10;
+    hEl.value = Math.round(hIn * 2.54);
+    gwEl.value = Math.round(gwLbs / 2.20462 * 10) / 10;
+  }
+  calc();
+}
+
+function getKg(fieldId) {
+  var v = parseFloat(document.getElementById(fieldId).value) || 0;
+  return unit === 'imperial' ? v / 2.20462 : v;
+}
+
+function getCm() {
+  var v = parseFloat(document.getElementById('height').value) || 175;
+  return unit === 'imperial' ? v * 2.54 : v;
+}
+
+function formatWeight(kg) {
+  if (unit === 'imperial') {
+    return Math.round(kg * 2.20462) + ' lbs';
+  }
+  return kg.toFixed(1) + ' kg';
+}
+
+function getTDEE() {
+  var age = parseFloat(document.getElementById('age').value) || 30;
+  var sex = document.getElementById('sex').value;
+  var weight = getKg('weight');
+  var height = getCm();
+  var activity = parseFloat(document.getElementById('activity').value) || 1.375;
+  var bmr = sex === 'male'
+    ? 10 * weight + 6.25 * height - 5 * age + 5
+    : 10 * weight + 6.25 * height - 5 * age - 161;
+  return Math.round(bmr * activity);
+}
+
+function formatWeeklyLoss(kgPerWeek) {
+  if (unit === 'imperial') {
+    return (kgPerWeek * 2.20462).toFixed(2) + ' lbs / wk';
+  }
+  return kgPerWeek.toFixed(2) + ' kg / wk';
+}
+
+function getGoalDate(calcWeeks) {
+  var d = new Date();
+  d.setDate(d.getDate() + calcWeeks * 7);
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function calc() {
+  var tdee = getTDEE();
+  document.getElementById('tdee-disp').textContent = tdee.toLocaleString() + ' kcal';
+
+  var weightKg = getKg('weight');
+  var goalKg = getKg('goal-weight');
+  var weeks = parseFloat(document.getElementById('weeks').value) || 16;
+  var defPref = document.getElementById('deficit-pref').value;
+  var fatToLose = Math.max(0, weightKg - goalKg);
+  var totalKcal = fatToLose * 7700;
+  var dailyDeficit, weeklyLoss, calcWeeks;
+
+  var weeksWrap = document.getElementById('weeks-input-wrap');
+  var weeksHint = document.getElementById('weeks-hint');
+  var timelineRow = document.getElementById('timeline-row');
+
+  if (defPref === 'moderate') {
+    dailyDeficit = 500;
+    weeklyLoss = (500 * 7) / 7700;
+    calcWeeks = fatToLose > 0 ? Math.ceil(fatToLose / weeklyLoss) : 0;
+    weeksWrap.style.display = 'none';
+    weeksHint.style.display = 'none';
+    timelineRow.style.display = 'flex';
+    document.getElementById('timeline-disp').textContent = calcWeeks + ' weeks';
+  } else if (defPref === 'aggressive') {
+    dailyDeficit = 750;
+    weeklyLoss = (750 * 7) / 7700;
+    calcWeeks = fatToLose > 0 ? Math.ceil(fatToLose / weeklyLoss) : 0;
+    weeksWrap.style.display = 'none';
+    weeksHint.style.display = 'none';
+    timelineRow.style.display = 'flex';
+    document.getElementById('timeline-disp').textContent = calcWeeks + ' weeks';
+  } else {
+    dailyDeficit = fatToLose > 0 ? Math.round((totalKcal / weeks) / 7) : 0;
+    weeklyLoss = fatToLose > 0 ? fatToLose / weeks : 0;
+    calcWeeks = weeks;
+    weeksWrap.style.display = 'block';
+    weeksHint.style.display = 'block';
+    timelineRow.style.display = 'none';
+  }
+
+  document.getElementById('total-disp').textContent = formatWeight(fatToLose);
+  document.getElementById('weekly-disp').textContent = formatWeeklyLoss(weeklyLoss);
+
+  var deficitEl = document.getElementById('deficit-disp');
+  deficitEl.textContent = dailyDeficit.toLocaleString() + ' kcal';
+  if (defPref === 'auto' && dailyDeficit > 1000) {
+    deficitEl.style.color = 'var(--red)';
+    deficitEl.title = 'Warning: very aggressive deficit';
+  } else if (defPref === 'auto' && dailyDeficit > 750) {
+    deficitEl.style.color = '#f59e0b';
+    deficitEl.title = 'Caution: challenging deficit';
+  } else {
+    deficitEl.style.color = 'var(--red)';
+    deficitEl.title = '';
+  }
+}
+
+function animateCount(el, target) {
+  var start = 0;
+  var duration = 900;
+  var startTime = null;
+  function step(ts) {
+    if (!startTime) startTime = ts;
+    var progress = Math.min((ts - startTime) / duration, 1);
+    var ease = 1 - Math.pow(1 - progress, 3);
+    var current = Math.round(ease * target);
+    el.textContent = current.toLocaleString();
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function renderResults() {
+  var tdee = getTDEE();
+  var weightKg = getKg('weight');
+  var goalKg = getKg('goal-weight');
+  var weeks = parseFloat(document.getElementById('weeks').value) || 16;
+  var defPref = document.getElementById('deficit-pref').value;
+  var sex = document.getElementById('sex').value;
+  var fatToLose = Math.max(0, weightKg - goalKg);
+  var totalKcal = fatToLose * 7700;
+  var dailyDeficit, weeklyLoss, calcWeeks;
+
+  if (defPref === 'moderate') {
+    dailyDeficit = 500;
+    weeklyLoss = (500 * 7) / 7700;
+    calcWeeks = fatToLose > 0 ? Math.ceil(fatToLose / weeklyLoss) : 0;
+  } else if (defPref === 'aggressive') {
+    dailyDeficit = 750;
+    weeklyLoss = (750 * 7) / 7700;
+    calcWeeks = fatToLose > 0 ? Math.ceil(fatToLose / weeklyLoss) : 0;
+  } else {
+    dailyDeficit = fatToLose > 0 ? Math.round((totalKcal / weeks) / 7) : 0;
+    weeklyLoss = fatToLose > 0 ? fatToLose / weeks : 0;
+    calcWeeks = weeks;
+  }
+
+  var target = Math.max(0, Math.round(tdee - dailyDeficit));
+  var proteinMin = Math.round(goalKg * 1.8);
+  var proteinMax = Math.round(goalKg * 2.2);
+  var goalDate = getGoalDate(calcWeeks);
+  var lossDisplay = formatWeeklyLoss(weeklyLoss);
+
+  var calEl = document.getElementById('r-cal');
+  calEl.style.opacity = '0';
+  calEl.style.transform = 'scale(0.9)';
+  setTimeout(function() {
+    calEl.style.transition = 'opacity .3s, transform .4s cubic-bezier(.34,1.56,.64,1)';
+    calEl.style.opacity = '1';
+    calEl.style.transform = 'scale(1)';
+    animateCount(calEl, target);
+  }, 80);
+
+  var subPhrases = [
+    'That\'s it. That\'s the whole job. Hit ' + target.toLocaleString() + ' kcal most days and the weight moves.',
+    'Simple doesn\'t mean easy — but ' + target.toLocaleString() + ' kcal a day is your number. Own it.',
+    target.toLocaleString() + ' kcal. Not a suggestion. Hit this consistently and watch what happens.'
+  ];
+  document.getElementById('r-sub').textContent = subPhrases[Math.floor(Math.random() * subPhrases.length)];
+
+  document.getElementById('r-tdee').textContent = tdee.toLocaleString();
+  document.getElementById('r-def').textContent = dailyDeficit.toLocaleString();
+  document.getElementById('r-wk').textContent = lossDisplay.replace(' / wk', '');
+  document.getElementById('r-wks').textContent = calcWeeks;
+  document.getElementById('r-date').textContent = 'Goal date: ' + goalDate;
+  document.getElementById('r-sw').textContent = formatWeight(weightKg) + ' (now)';
+  document.getElementById('r-gw').textContent = formatWeight(goalKg) + ' (goal)';
+
+  document.getElementById('r-pct').textContent = '';
+  setTimeout(function() {
+    document.getElementById('prog-fill').style.width = '0%';
+  }, 50);
+
+  document.getElementById('protein-num').innerHTML = proteinMin + '–' + proteinMax + '<span>grams per day</span>';
+  document.getElementById('protein-sub').textContent = 'Based on your goal weight (' + formatWeight(goalKg) + ')';
+  document.getElementById('lever2-d').textContent = 'Hit ' + proteinMin + '–' + proteinMax + 'g of protein every day. Keeps you full, preserves your muscle mass, and stops fat loss from turning into muscle loss.';
+
+  var verdictHtml = '';
+  var ctaTitle = 'Ready to make\nthis real?';
+  var ctaBody = 'You\'ve got your number. Now you need the system, the accountability, and a coach who\'s been exactly where you are.';
+  var ctaEyebrow = 'Dream Body Blueprint';
+
+  if (dailyDeficit <= 0) {
+    verdictHtml = '<div class="verdict good"><div class="vtag">Already there</div><div class="vtext">Your goal matches your current weight. If you\'re looking to recomposition — lose fat and build muscle simultaneously — let\'s talk training and protein targets.</div></div>';
+  } else if (dailyDeficit < 300) {
+    verdictHtml = '<div class="verdict good"><div class="vtag">Highly sustainable</div><div class="vtext">A gentle deficit. Week-to-week progress feels slow but the compound effect is real. Patience beats aggression every single time.</div></div>';
+  } else if (dailyDeficit <= 500) {
+    verdictHtml = '<div class="verdict good"><div class="vtag">The sweet spot</div><div class="vtext">500 kcal below maintenance is the gold standard. Enough to see consistent progress week on week — without destroying your energy, social life, or sanity.</div></div>';
+  } else if (dailyDeficit <= 750) {
+    verdictHtml = '<div class="verdict caution"><div class="vtag">Challenging — doable</div><div class="vtext">This requires real focus. Hunger will show up. Track everything, keep protein high, and don\'t let one bad day become a bad week. Consider extending your timeframe if this feels overwhelming.</div></div>';
+    ctaTitle = 'This plan needs\na solid system.';
+    ctaBody = 'A challenging deficit is manageable with the right structure behind it. Coaching gives you accountability when motivation dips — and it will.';
+  } else if (dailyDeficit <= 1000) {
+    verdictHtml = '<div class="verdict bad"><div class="vtag">Aggressive — reconsider</div><div class="vtext">A deficit this large risks muscle loss, energy crashes, and the binge-restrict cycle. Extend your timeframe. Four extra weeks of patience beats ten weeks of suffering followed by regaining it all.</div></div>';
+    ctaTitle = 'Your plan needs\nadjusting.';
+    ctaBody = 'This deficit is going to fight you. Let\'s build something that actually works for your life, not against it.';
+    ctaEyebrow = 'Let\'s fix this together';
+  } else {
+    verdictHtml = '<div class="verdict bad"><div class="vtag">Unsustainable</div><div class="vtext">This isn\'t a fat loss plan — it\'s a crash. Reset your goal weight, extend your timeframe, or both. We build bodies here, not eating disorders.</div></div>';
+    ctaTitle = 'Let\'s rebuild\nthis plan.';
+    ctaBody = 'The numbers don\'t work. That\'s not a failure — that\'s just maths. Let\'s set you a goal that\'s actually achievable.';
+    ctaEyebrow = 'This needs a rethink';
+  }
+
+  var minCal = sex === 'female' ? 1200 : 1500;
+  if (target < minCal && dailyDeficit > 0) {
+    verdictHtml += '<div class="verdict bad" style="margin-top:8px"><div class="vtag">Calorie floor warning</div><div class="vtext">Your target drops below ' + minCal.toLocaleString() + ' kcal — the minimum recommended for ' + (sex === 'female' ? 'women' : 'men') + '. Extend your timeframe. This is non-negotiable.</div></div>';
+  }
+
+  document.getElementById('verdict-area').innerHTML = verdictHtml;
+  document.getElementById('cta-title').innerHTML = ctaTitle.replace('\n', '<br>');
+  document.getElementById('cta-body').textContent = ctaBody;
+  document.getElementById('cta-eyebrow').textContent = ctaEyebrow;
+}
+
+function goTo(n) {
+  for (var i = 1; i <= 3; i++) {
+    document.getElementById('screen-' + i).classList.toggle('active', i === n);
+    var pill = document.getElementById('pill-' + i);
+    pill.classList.toggle('active', i === n);
+    pill.classList.toggle('done', i < n);
+  }
+  if (n === 3) renderResults();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+calc();
+</script>
+</body>
+</html>
