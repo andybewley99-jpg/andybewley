@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>DBB Exercise Library</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --red:#E8192C;--red-glow:rgba(232,25,44,0.15);
+  --bg:#0D0D0D;--bg-2:#141414;--bg-3:#1C1C1C;--bg-4:#242424;
+  --border:rgba(255,255,255,0.07);--border-hover:rgba(232,25,44,0.4);
+  --text:#F0F0F0;--text-muted:#8A8E94;--text-dim:#444;
+  --silver:#B0B8C1;
+}
+html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;line-height:1.6;min-height:100vh;overflow-x:hidden;}
+
+/* HEADER */
+header{background:var(--bg-2);border-bottom:1px solid var(--border);padding:0 16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;height:54px;}
+.logo{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:20px;letter-spacing:0.04em;text-transform:uppercase;}
+.logo span{color:var(--red);}
+.header-count{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);}
+.header-count strong{color:var(--red);}
+
+/* HERO */
+.hero{background:var(--bg-2);border-bottom:1px solid var(--border);padding:32px 16px 28px;text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:400px;height:160px;background:var(--red-glow);filter:blur(60px);pointer-events:none;}
+.hero h1{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(32px,8vw,56px);letter-spacing:0.02em;text-transform:uppercase;line-height:1;position:relative;}
+.hero h1 span{color:var(--red);}
+.hero p{color:var(--silver);font-size:14px;margin-top:8px;position:relative;}
+
+/* SEARCH */
+.search-wrap{padding:16px 16px 0;position:relative;}
+.search-wrap svg{position:absolute;left:28px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;}
+input[type="text"]{width:100%;background:var(--bg-3);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px 14px 46px;font-family:'Barlow',sans-serif;font-size:16px;color:var(--text);outline:none;transition:border-color 0.2s;-webkit-appearance:none;}
+input[type="text"]::placeholder{color:var(--text-dim);}
+input[type="text"]:focus{border-color:var(--red);}
+
+/* FILTER STRIP */
+.filter-strip-wrap{padding:12px 0 0;overflow:hidden;}
+.filter-strip{display:flex;gap:8px;overflow-x:auto;padding:4px 16px 12px;scrollbar-width:none;-ms-overflow-style:none;}
+.filter-strip::-webkit-scrollbar{display:none;}
+.filter-btn{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:10px 18px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg-3);color:var(--text-muted);cursor:pointer;transition:all 0.18s;white-space:nowrap;flex-shrink:0;-webkit-appearance:none;}
+.filter-btn:active{transform:scale(0.96);}
+.filter-btn.active{background:var(--red);border-color:var(--red);color:#fff;}
+
+/* RECENTLY VIEWED */
+.recently-viewed{padding:0 16px 4px;}
+.recently-viewed.hidden{display:none;}
+.rv-label{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.rv-label button{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-dim);background:none;border:none;cursor:pointer;padding:0;margin-left:auto;}
+.rv-strip{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;padding-bottom:4px;}
+.rv-strip::-webkit-scrollbar{display:none;}
+.rv-chip{display:flex;align-items:center;gap:8px;background:var(--bg-3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;cursor:pointer;flex-shrink:0;transition:border-color 0.18s;min-width:0;max-width:200px;}
+.rv-chip:active{transform:scale(0.97);}
+.rv-chip:hover{border-color:var(--border-hover);}
+.rv-thumb{width:40px;height:28px;border-radius:4px;object-fit:cover;flex-shrink:0;}
+.rv-name{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* RESULTS BAR */
+.results-bar{padding:16px 16px 4px;display:flex;align-items:center;justify-content:space-between;}
+.results-bar span{font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);}
+.results-bar strong{color:var(--red);}
+
+/* SECTION HEADERS — sticky */
+.section-header{position:sticky;top:54px;z-index:50;background:var(--bg);padding:12px 16px 10px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);}
+.section-header h2{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:18px;letter-spacing:0.06em;text-transform:uppercase;}
+.count-badge{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--red);background:var(--red-glow);border:1px solid rgba(232,25,44,0.25);padding:2px 8px;border-radius:4px;}
+.section-line{flex:1;height:1px;background:var(--border);}
+
+/* CARD LIST */
+.card-list{padding:0 16px 8px;}
+
+/* CARD — full width, horizontal layout */
+.card{display:flex;align-items:stretch;background:var(--bg-3);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:border-color 0.18s;margin-bottom:10px;min-height:76px;}
+.card:active{transform:scale(0.99);}
+.card:hover{border-color:var(--border-hover);}
+
+.card-thumb{position:relative;width:120px;min-width:120px;background:var(--bg-4);flex-shrink:0;}
+@media(min-width:480px){.card-thumb{width:150px;min-width:150px;}}
+.card-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.play-btn{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.3);}
+.play-circle{width:38px;height:38px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.play-circle svg{margin-left:3px;}
+
+.card-body{padding:12px 14px;flex:1;display:flex;flex-direction:column;justify-content:center;gap:4px;min-width:0;}
+.card-muscle{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--red);}
+.card-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;line-height:1.2;color:var(--text);}
+.card-yt{display:inline-flex;align-items:center;gap:4px;margin-top:6px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);text-decoration:none;background:var(--bg-4);border:1px solid var(--border);padding:4px 8px;border-radius:5px;width:fit-content;transition:color 0.15s,border-color 0.15s;}
+.card-yt:hover{color:var(--red);border-color:var(--border-hover);}
+.card-yt svg{flex-shrink:0;}
+
+/* MODAL */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:200;display:none;align-items:flex-end;justify-content:center;}
+@media(min-width:600px){.modal-backdrop{align-items:center;padding:20px;}}
+.modal-backdrop.open{display:flex;}
+.modal{background:var(--bg-2);border:1px solid var(--border);border-radius:16px 16px 0 0;width:100%;overflow:hidden;}
+@media(min-width:600px){.modal{border-radius:14px;max-width:820px;}}
+.modal-drag{width:36px;height:4px;background:var(--border);border-radius:2px;margin:10px auto 6px;}
+@media(min-width:600px){.modal-drag{display:none;}}
+.modal-video{aspect-ratio:16/9;width:100%;background:#000;}
+.modal-video iframe{width:100%;height:100%;border:none;display:block;}
+.modal-info{padding:16px 18px 24px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+.modal-muscle{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--red);margin-bottom:3px;}
+.modal-name{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;letter-spacing:0.02em;text-transform:uppercase;line-height:1.15;}
+.modal-actions{display:flex;align-items:center;gap:8px;margin-top:10px;}
+.modal-yt-btn{display:inline-flex;align-items:center;gap:6px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);text-decoration:none;background:var(--bg-4);border:1px solid var(--border);padding:8px 14px;border-radius:8px;transition:color 0.15s,border-color 0.15s;}
+.modal-yt-btn:hover{color:var(--red);border-color:var(--border-hover);}
+.modal-close{background:var(--bg-4);border:1px solid var(--border);border-radius:8px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-muted);flex-shrink:0;transition:background 0.2s,color 0.2s;-webkit-appearance:none;}
+.modal-close:hover{background:var(--red);color:#fff;border-color:var(--red);}
+
+/* NO RESULTS */
+.no-results{text-align:center;padding:60px 24px;display:none;}
+.no-results.show{display:block;}
+.no-results h3{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:var(--text-muted);margin-bottom:8px;}
+.no-results p{color:var(--text-dim);font-size:14px;}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:20px 16px;text-align:center;font-size:13px;color:var(--text-dim);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.06em;text-transform:uppercase;margin-top:16px;}
+footer strong{color:var(--red);}
+
+/* SAFE AREA */
+@supports(padding:max(0px)){
+  .modal-info{padding-bottom:max(24px,env(safe-area-inset-bottom));}
+  footer{padding-bottom:max(20px,env(safe-area-inset-bottom));}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Dream Body <span>Blueprint</span></div>
+  <div class="header-count">Showing <strong id="header-count">0</strong></div>
+</header>
+
+<div class="hero">
+  <h1>Exercise <span>Library</span></h1>
+  <p>Find your exercise. Watch. Execute.</p>
+</div>
+
+<div class="search-wrap">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+  <input type="text" id="search" placeholder="Search e.g. hip thrust, cable, squat..." autocomplete="off" inputmode="search">
+</div>
+
+<div class="filter-strip-wrap">
+  <div class="filter-strip" id="filters">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="Chest">Chest</button>
+    <button class="filter-btn" data-filter="Back">Back</button>
+    <button class="filter-btn" data-filter="Shoulders">Shoulders</button>
+    <button class="filter-btn" data-filter="Biceps">Biceps</button>
+    <button class="filter-btn" data-filter="Triceps">Triceps</button>
+    <button class="filter-btn" data-filter="Forearms">Forearms</button>
+    <button class="filter-btn" data-filter="Legs">Legs</button>
+    <button class="filter-btn" data-filter="Glutes">Glutes</button>
+    <button class="filter-btn" data-filter="Calves">Calves</button>
+    <button class="filter-btn" data-filter="Core">Core</button>
+  </div>
+</div>
+
+<div class="recently-viewed hidden" id="rv-section">
+  <div class="rv-label">
+    Recently Viewed
+    <button onclick="clearRecent()">Clear</button>
+  </div>
+  <div class="rv-strip" id="rv-strip"></div>
+</div>
+
+<div class="results-bar"><span>Showing <strong id="count">0</strong> exercises</span></div>
+<div id="library-wrap"></div>
+<div class="no-results" id="no-results"><h3>No exercises found</h3><p>Try a different search or filter</p></div>
+
+<footer><strong>Dream Body Blueprint</strong> &mdash; Exercise Library</footer>
+
+<div class="modal-backdrop" id="modal" onclick="closeModal(event)">
+  <div class="modal" id="modal-box">
+    <div class="modal-drag"></div>
+    <div class="modal-video"><iframe id="modal-iframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+    <div class="modal-info">
+      <div style="min-width:0;flex:1;">
+        <div class="modal-muscle" id="modal-muscle"></div>
+        <div class="modal-name" id="modal-name"></div>
+        <div class="modal-actions">
+          <a class="modal-yt-btn" id="modal-yt-link" href="#" target="_blank" rel="noopener">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Open in YouTube
+          </a>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModalBtn()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+var EXERCISES=[
+  // CHEST
+  {name:"Single Arm Press Around",muscle:"Chest",videoId:"SOtyOYv13_4"},
+  {name:"Single Arm Decline Press Around",muscle:"Chest",videoId:"QuqcjAs-M74"},
+  {name:"Single Arm Incline Press Around",muscle:"Chest",videoId:"kYPWesskNw0"},
+  {name:"Upright Cable Chest Press",muscle:"Chest",videoId:"miRqyOV8YRA"},
+  {name:"Incline Cable Chest Press",muscle:"Chest",videoId:"pHYMPGRhYRU"},
+  {name:"Decline Cable Chest Press",muscle:"Chest",videoId:"eFkr-KRAaLA"},
+  {name:"Bent Over Cable Chest Fly",muscle:"Chest",videoId:"gUc4QBoExsM"},
+  {name:"Standing Upright Cable Chest Fly",muscle:"Chest",videoId:"JdY6R54SHA4"},
+  {name:"Standing Incline Cable Chest Fly",muscle:"Chest",videoId:"wXB9gr142zw"},
+  {name:"Standing Decline Cable Chest Fly",muscle:"Chest",videoId:"-J-jJhQDuxs"},
+  {name:"Seated Cable Chest Fly Upright",muscle:"Chest",videoId:"wKxU_XtEVFE"},
+  {name:"Seated Incline Cable Chest Fly",muscle:"Chest",videoId:"xEmkC_esb2E"},
+  {name:"Seated Decline Cable Chest Fly",muscle:"Chest",videoId:"nj-5hjn6iKk"},
+  {name:"The Purvis Press",muscle:"Chest",videoId:"EE35KPwAxpg"},
+  {name:"Cuffed Upright Chest Press",muscle:"Chest",videoId:"g5sezoRpBzg"},
+  {name:"Cuffed Incline Chest Press",muscle:"Chest",videoId:"0I-1-rKkrfs"},
+  {name:"Cuffed Decline Chest Press",muscle:"Chest",videoId:"0I-1-rKkrfs"},
+  {name:"Decline DB Press",muscle:"Chest",videoId:"hPQMfoX9OXU"},
+  {name:"Flat DB Press",muscle:"Chest",videoId:"ZogxGuFAi8M"},
+  {name:"Low Incline DB Press",muscle:"Chest",videoId:"8YFcD_RznVs"},
+  {name:"High Incline DB Press",muscle:"Chest",videoId:"4cdxVXlkHP0"},
+  {name:"Flat DB Fly",muscle:"Chest",videoId:"wSh0FW22LtM"},
+  {name:"Incline DB Fly",muscle:"Chest",videoId:"xDyheVo2CF8"},
+  {name:"Barbell Floor Press",muscle:"Chest",videoId:"vXy7uUh2V2M"},
+  {name:"Decline BB Bench Press",muscle:"Chest",videoId:"fowVcIy6zNo"},
+  {name:"Barbell Bench Press",muscle:"Chest",videoId:"T1q0GjJxJ8A"},
+  {name:"Incline BB Bench Press",muscle:"Chest",videoId:"oT8Y9ntBO6I"},
+  {name:"Close Grip Decline BB Bench Press",muscle:"Chest",videoId:"IWlng1oSbds"},
+  {name:"Close Grip Flat BB Bench Press",muscle:"Chest",videoId:"qDLCAROdqPs"},
+  {name:"Close Grip Incline BB Bench Press",muscle:"Chest",videoId:"5NufpT_W7K4"},
+  {name:"Kneeling Push Up",muscle:"Chest",videoId:"sA0UoUeJXkw"},
+  {name:"Push Up",muscle:"Chest",videoId:"B8Jipc1-fhE"},
+  {name:"Push Up With Handles",muscle:"Chest",videoId:"9BLskc_b0oo"},
+  {name:"Push Up Shoulder Width",muscle:"Chest",videoId:"W1gAg7wWY7w"},
+  {name:"Push Up Elbow Extension Focus",muscle:"Chest",videoId:"twY_WzWH3ec"},
+  {name:"Push Up Feet Elevated",muscle:"Chest",videoId:"EGq8LCtdAKQ"},
+  {name:"Incline Push Up",muscle:"Chest",videoId:"wEysJSDkG-o"},
+  {name:"Pike Push Up",muscle:"Chest",videoId:"fmLp31r3IjI"},
+  {name:"Pin Loaded Chest Press",muscle:"Chest",videoId:"bOPE5ugMWTw"},
+  {name:"Pin Loaded Cybex Eagle Converging Chest Press",muscle:"Chest",videoId:"cSV1DvjOPzc"},
+  {name:"Flat Smith Machine Press",muscle:"Chest",videoId:"U-rfCkcDR2Y"},
+  {name:"Flat Smith Machine Press Reverse Banded",muscle:"Chest",videoId:"iPxiWzRgoGs"},
+  {name:"Incline Smith Machine Press",muscle:"Chest",videoId:"gHe_2tKi8KQ"},
+  {name:"Incline Smith Machine Press Reverse Banded",muscle:"Chest",videoId:"OmbR_yo6KBk"},
+  {name:"Incline Chest Press Machine",muscle:"Chest",videoId:"gMrnjMgVcTM"},
+  // BACK
+  {name:"Goulden Row",muscle:"Back",videoId:"xzKa7rnzA48"},
+  {name:"Seated Cable Row",muscle:"Back",videoId:"oGDi8VxDZq0"},
+  {name:"Seated Cable Row With Spinal Movement",muscle:"Back",videoId:"D_R5OXc0uA8"},
+  {name:"Seated Cable Row With Lat Focus",muscle:"Back",videoId:"g2lBI_W-B1k"},
+  {name:"Seated Cable Row With Upper Back Focus",muscle:"Back",videoId:"WKix6FH2AYM"},
+  {name:"Seated V-Bar Cable Row With Lat Focus",muscle:"Back",videoId:"M_YUPiERIRE"},
+  {name:"Chest Supported Cable Row",muscle:"Back",videoId:"i7iDLzDTEtM"},
+  {name:"Chest Supported Cable Row With Lat Focus",muscle:"Back",videoId:"i_WzqlgLXU4"},
+  {name:"Chest Supported Cable Row With Upper Back Focus",muscle:"Back",videoId:"DhUMbczcJhI"},
+  {name:"Chest Supported Cable Pulldowns",muscle:"Back",videoId:"VTfOgtcbzEE"},
+  {name:"Chest Supported Cable Rowdown",muscle:"Back",videoId:"4cu2lhk_Kzw"},
+  {name:"Single Arm Cable Rowdown",muscle:"Back",videoId:"9r4pTwEs1dI"},
+  {name:"Single Arm Cable Pulldown",muscle:"Back",videoId:"ERzQDfdnb4o"},
+  {name:"Single Arm Pullaround",muscle:"Back",videoId:"ojbcIDEoWUE"},
+  {name:"Single Arm Seated Cable Row",muscle:"Back",videoId:"DO9wnsR93oc"},
+  {name:"Single Arm Seated Cable Row With Spinal Movement",muscle:"Back",videoId:"T8NqjCI282Y"},
+  {name:"Single Arm Seated Cable Row With Lat Focus",muscle:"Back",videoId:"wO5I5Bzl0VA"},
+  {name:"Standing Cable Shrug",muscle:"Back",videoId:"ceagpeTG4v0"},
+  {name:"One-Arm DB Row",muscle:"Back",videoId:"ZQpNuJcw84I"},
+  {name:"3-Point DB Row",muscle:"Back",videoId:"AprwKVcI2n4"},
+  {name:"Incline Lying DB Row",muscle:"Back",videoId:"qE-kqW17A1g"},
+  {name:"Incline Lying DB Row With Flexion and Extension",muscle:"Back",videoId:"H3QteDO_Kx0"},
+  {name:"Bent Over DB Row",muscle:"Back",videoId:"zwKm1peTPyA"},
+  {name:"DB Rear Delt Fly",muscle:"Back",videoId:"zPySAZ_aaeI"},
+  {name:"BB Bent Over Row",muscle:"Back",videoId:"Zukc4lhXi1o"},
+  {name:"BB Pendlay Row",muscle:"Back",videoId:"Csztgx9sJPo"},
+  {name:"BB Shrug",muscle:"Back",videoId:"LsH2sYS6E60"},
+  {name:"BB Rack Pull",muscle:"Back",videoId:"PdJQUHKQxkg"},
+  {name:"BB Deadlift",muscle:"Back",videoId:"F1aZLECT0hE"},
+  {name:"Dorian Deadlift",muscle:"Back",videoId:"RV7ntJdNZng"},
+  {name:"Sumo Deadlift",muscle:"Back",videoId:"gZljOQnyYv8"},
+  {name:"Trap Bar Deadlift",muscle:"Back",videoId:"kTRuaLVNhPU"},
+  {name:"Pull Up",muscle:"Back",videoId:"hsk9Uk3OgOU"},
+  {name:"Chin Up",muscle:"Back",videoId:"d3g4on4iXb8"},
+  {name:"D Handle Pull Up",muscle:"Back",videoId:"mVHNBSIefts"},
+  {name:"Chest Supported T-Bar Row",muscle:"Back",videoId:"ctI3BWy5wPQ"},
+  {name:"Chest Supported T-Bar Row With Spinal Movement",muscle:"Back",videoId:"5Duw-QsqKX0"},
+  {name:"Lat Pulldown",muscle:"Back",videoId:"vv3bNvg31BI"},
+  {name:"D-Handle Lat Pulldown",muscle:"Back",videoId:"k5gXO07O-VA"},
+  {name:"Neutral Grip Lat Pulldown",muscle:"Back",videoId:"CkVRFMnhYGk"},
+  {name:"Underhand Grip Lat Pulldown",muscle:"Back",videoId:"GvO6m3OLY4k"},
+  {name:"Single Arm Lat Pulldown",muscle:"Back",videoId:"9qqWZrWrJgo"},
+  {name:"Chest Supported Machine Row",muscle:"Back",videoId:"vLi-ebVePqc"},
+  {name:"Chest Supported Machine Row With Spinal Flexion Extension",muscle:"Back",videoId:"cZSQcztDenM"},
+  {name:"Chest Supported Machine Row Single Arm",muscle:"Back",videoId:"B8PBIUZM5ZA"},
+  {name:"Nautilus Nitro Lat Pulldown",muscle:"Back",videoId:"QNkQ8M75d_A"},
+  {name:"Nautilus Nitro Lat Pulldown Lat Focused",muscle:"Back",videoId:"2otmbau5XpY"},
+  {name:"Nautilus Nitro Lat Pulldown Single Arm",muscle:"Back",videoId:"wInUCj632Cs"},
+  {name:"Hammer Strength Chest Supported Low Row",muscle:"Back",videoId:"av7-0KpzSKE"},
+  {name:"Hammer Strength Chest Supported Low Row With Spinal Movement",muscle:"Back",videoId:"bB4acoBZ2ZY"},
+  {name:"Face Pull",muscle:"Back",videoId:"c4_Ns1le3Gw"},
+  {name:"Mag Grip Upper Back",muscle:"Back",videoId:"EdNsl6zQtVk"},
+  // SHOULDERS
+  {name:"Seated Cuffed Cable Shoulder Press",muscle:"Shoulders",videoId:"E00xpH-6Aqc"},
+  {name:"Seated D-Handle Cable Shoulder Press",muscle:"Shoulders",videoId:"rTi4ZoxTcfo"},
+  {name:"Seated Arm Raised Cable Lat Raise",muscle:"Shoulders",videoId:"WTZczKvyKWA"},
+  {name:"Seated D-Handle Arm Raised Lat Raise",muscle:"Shoulders",videoId:"2I-nWTPKEHg"},
+  {name:"Seated Arm Raised Wrist Cuffed Lat Raise",muscle:"Shoulders",videoId:"P9QQp3lQ9Vw"},
+  {name:"Seated Arm Raised Elbow Cuffed Lat Raise",muscle:"Shoulders",videoId:"Elix8qHGhcw"},
+  {name:"Seated Cable Crucifix Raise",muscle:"Shoulders",videoId:"C7FxijnJoQU"},
+  {name:"Seated D-Handle Crucifix Raise",muscle:"Shoulders",videoId:"XEzv65Dzghs"},
+  {name:"Seated Wrist Cuffed Crucifix Raise",muscle:"Shoulders",videoId:"buplZ33XozE"},
+  {name:"Seated Elbow Cuffed Crucifix Raise",muscle:"Shoulders",videoId:"npTkMpnHEhg"},
+  {name:"Seated Rear Delt Fly To Row",muscle:"Shoulders",videoId:"VlVktJdVxt0"},
+  {name:"Seated Cross Cable Rear Delt Row",muscle:"Shoulders",videoId:"BUjth1Db2p8"},
+  {name:"Seated Rear Delt Fly",muscle:"Shoulders",videoId:"uRfYbNw2kkk"},
+  {name:"Seated D-Handle Rear Delt Fly",muscle:"Shoulders",videoId:"3W89dH3F8wE"},
+  {name:"Seated Wrist Cuffed Rear Delt Fly",muscle:"Shoulders",videoId:"9DMuIPdYZVc"},
+  {name:"Seated Elbow Cuffed Rear Delt Fly",muscle:"Shoulders",videoId:"BMVkVaEEr2Q"},
+  {name:"Lying Cable Lat Raise",muscle:"Shoulders",videoId:"bRtlX-zZM74"},
+  {name:"Lying D-Handle Lat Raise",muscle:"Shoulders",videoId:"T6IZZgl27Rw"},
+  {name:"Lying Wrist Cuffed Lat Raise",muscle:"Shoulders",videoId:"X1Sk02bEgBg"},
+  {name:"Lying Elbow Cuffed Lat Raise",muscle:"Shoulders",videoId:"VtBCOifiGIw"},
+  {name:"Lying Cable Crucifix Raise",muscle:"Shoulders",videoId:"zehjqNGEkT0"},
+  {name:"Lying D-Handle Crucifix Raise",muscle:"Shoulders",videoId:"b4lD10FgsGU"},
+  {name:"Lying Wrist Cuffed Crucifix Raise",muscle:"Shoulders",videoId:"IwNxiGZJOvQ"},
+  {name:"Lying Elbow Cuffed Crucifix Raise",muscle:"Shoulders",videoId:"pSmBUAlAN1Y"},
+  {name:"Lying Cable Rear Delt Fly",muscle:"Shoulders",videoId:"HtPmYtOmaAE"},
+  {name:"Lying D-Handle Cable Rear Delt Fly",muscle:"Shoulders",videoId:"gJsulhQ32mo"},
+  {name:"Lying Wrist Cuffed Rear Delt Fly",muscle:"Shoulders",videoId:"aymsTyKs1Fk"},
+  {name:"Lying Elbow Cuffed Rear Delt Fly",muscle:"Shoulders",videoId:"tUxP-o9T2Xc"},
+  {name:"Floor Lying Cable Lat Raise",muscle:"Shoulders",videoId:"t-TuFcK8N38"},
+  {name:"Floor Lying Wrist Cuffed Lat Raise",muscle:"Shoulders",videoId:"jAaTxGnmnBI"},
+  {name:"Floor Lying Elbow Cuffed Lat Raise",muscle:"Shoulders",videoId:"VaHmX3F3mVc"},
+  {name:"Floor Lying Crucifix Raise",muscle:"Shoulders",videoId:"MV7XO7J896k"},
+  {name:"Floor Lying Wrist Cuffed Crucifix Raise",muscle:"Shoulders",videoId:"VjkK2hjeHGE"},
+  {name:"Floor Lying Elbow Cuffed Crucifix Raise",muscle:"Shoulders",videoId:"RPGZJK5kPxU"},
+  {name:"Floor Lying Cable Rear Delt Fly",muscle:"Shoulders",videoId:"kClAcTJcYmQ"},
+  {name:"Floor Lying Wrist Cuffed Rear Delt Fly",muscle:"Shoulders",videoId:"ZRQ8xA9C4AY"},
+  {name:"Floor Lying Elbow Cuffed Rear Delt Fly",muscle:"Shoulders",videoId:"tJy5h5OhaL0"},
+  {name:"Standing Single Arm Y Raise",muscle:"Shoulders",videoId:"0xOEnhTSae0"},
+  {name:"Standing Single Arm Cable Lat Raise",muscle:"Shoulders",videoId:"tnRq0D7a3rs"},
+  {name:"Standing Single Arm Crucifix Raise",muscle:"Shoulders",videoId:"vQUmkZHcC9I"},
+  {name:"Standing Single Arm Behind The Back Cable Lat Raise",muscle:"Shoulders",videoId:"VLCIOng3vn4"},
+  {name:"Standing Single Arm Shoulder Flexed Lat Raise",muscle:"Shoulders",videoId:"sCDwlPYgNc0"},
+  {name:"Standing Cable Lat Raise",muscle:"Shoulders",videoId:"mSNqG-cQu4s"},
+  {name:"Standing Cable D-Handle Lat Raise",muscle:"Shoulders",videoId:"IJu5p4FW0Zc"},
+  {name:"Standing Wrist Cuffed Cable Lat Raise",muscle:"Shoulders",videoId:"9BdesZqbhN8"},
+  {name:"Standing Elbow Cuffed Cable Lat Raise",muscle:"Shoulders",videoId:"5PGgYmNWKsw"},
+  {name:"Standing Behind The Back Cable Lat Raise",muscle:"Shoulders",videoId:"kOguVakaL04"},
+  {name:"Standing Arm Raised Cable Lat Raise",muscle:"Shoulders",videoId:"Kj5_Rt0y7ao"},
+  {name:"Standing Arm Raised Wrist Cuffed Lat Raise",muscle:"Shoulders",videoId:"2BX4a9SFYsU"},
+  {name:"Standing Arm Raised Elbow Cuffed Lat Raise",muscle:"Shoulders",videoId:"Bjk852S-gtc"},
+  {name:"Standing Cable Y Raise",muscle:"Shoulders",videoId:"8tQMdYToOF4"},
+  {name:"Standing Cable D-Handle Y Raise",muscle:"Shoulders",videoId:"Smf_gzQ2NWQ"},
+  {name:"Standing Cable Crucifix Raise",muscle:"Shoulders",videoId:"A4q58zAC5kY"},
+  {name:"Standing D-Handle Cable Crucifix Raise",muscle:"Shoulders",videoId:"TPc0u2sdQ84"},
+  {name:"Standing Wrist Cuffed Crucifix Raise",muscle:"Shoulders",videoId:"DjMvkIwDvNs"},
+  {name:"Standing Elbow Cuffed Crucifix Raise",muscle:"Shoulders",videoId:"7KMDY42tyMk"},
+  {name:"Standing Rear Delt Fly",muscle:"Shoulders",videoId:"L5gTDr5G3Pk"},
+  {name:"Standing Cable Rear Delt Fly To Row",muscle:"Shoulders",videoId:"c97nTd8OmZ8"},
+  {name:"Standing Single Arm Rear Delt Fly",muscle:"Shoulders",videoId:"P61ViQmW5uU"},
+  {name:"Standing Wrist Cuffed Rear Delt Fly",muscle:"Shoulders",videoId:"qc0hALDXTtA"},
+  {name:"Standing Elbow Cuffed Rear Delt Fly",muscle:"Shoulders",videoId:"UDdm1OctOp0"},
+  {name:"Standing Cross Cable Rear Delt Row",muscle:"Shoulders",videoId:"6-tPOtuOfjs"},
+  {name:"Kneeling Elbow Cuffed Lat Raise",muscle:"Shoulders",videoId:"cnL_Jd-i9_0"},
+  {name:"Kneeling Elbow Cuffed Y Raise",muscle:"Shoulders",videoId:"jtTH0XvQ-7w"},
+  {name:"Kneeling Wrist Cuffed Y Raise",muscle:"Shoulders",videoId:"N8dm1s6JkoU"},
+  {name:"Standing Cuffed Cable and DB Lat Raise",muscle:"Shoulders",videoId:"AruKPbwCNos"},
+  {name:"Chest Supported DB Y-Raise",muscle:"Shoulders",videoId:"J53Rmxrq6jU"},
+  {name:"Chest Supported Rear Delt Fly",muscle:"Shoulders",videoId:"zPySAZ_aaeI"},
+  {name:"Seated DB Shoulder Press",muscle:"Shoulders",videoId:"Ay-8ViO7LtQ"},
+  {name:"Standing DB Shoulder Press",muscle:"Shoulders",videoId:"Off5sN0k-ow"},
+  {name:"Standing DB Lat Raise",muscle:"Shoulders",videoId:"hyKS04nUoA0"},
+  {name:"Standing DB Lat Raise Single Arm",muscle:"Shoulders",videoId:"FpNIAU2wFL4"},
+  {name:"Chest Supported DB Lat Raise",muscle:"Shoulders",videoId:"InYPMa4cGGc"},
+  {name:"Seated DB Lat Raise",muscle:"Shoulders",videoId:"YITjvcqtgKI"},
+  {name:"Side Lying DB Lat Raise",muscle:"Shoulders",videoId:"GuO95xTaIGQ"},
+  {name:"BB Push Press",muscle:"Shoulders",videoId:"6ookN8UO9Yw"},
+  {name:"BB Upright Row",muscle:"Shoulders",videoId:"6p1Sk4urQvk"},
+  {name:"Seated Barbell Shoulder Press",muscle:"Shoulders",videoId:"_XP8QwfLGCo"},
+  {name:"Standing BB Shoulder Press",muscle:"Shoulders",videoId:"BVJ7KoW5Mmc"},
+  {name:"Seated Shoulder Press Machine",muscle:"Shoulders",videoId:"kgfGf_vhsmk"},
+  {name:"Seated Shoulder Press Neutral Grip",muscle:"Shoulders",videoId:"_hk6h6yb-kU"},
+  {name:"Machine Lat Raise",muscle:"Shoulders",videoId:"TtFrRsbnGks"},
+  {name:"Machine Lat Raise Without Handles",muscle:"Shoulders",videoId:"L3is5B9HocA"},
+  {name:"Machine Lat Raise Single Arm",muscle:"Shoulders",videoId:"ZGCkUHwe9cY"},
+  {name:"Machine Lat Raise Single Arm Without Handles",muscle:"Shoulders",videoId:"w7EJZ8m3O-E"},
+  // BICEPS
+  {name:"Cable D-Handle Bicep Curl Facing Away",muscle:"Biceps",videoId:"WOjG68i_7Rs"},
+  {name:"Cable D-Handle Bicep Curl Single Arm Facing Away",muscle:"Biceps",videoId:"YMUGlAvknwg"},
+  {name:"Cable Seated D-Handle Bicep Curl Facing Away",muscle:"Biceps",videoId:"liKDLutoLaU"},
+  {name:"Cable D-Handle Bicep Curl Facing In",muscle:"Biceps",videoId:"Ybe243W_2dU"},
+  {name:"Cable D-Handle Gym Pin Style Bicep Curl Option 1",muscle:"Biceps",videoId:"Op0aWDtzOnM"},
+  {name:"Cable D-Handle Gym Pin Style Bicep Curl Option 2",muscle:"Biceps",videoId:"zVwiALWR4mA"},
+  {name:"Cable Long Rope Hammer Curl",muscle:"Biceps",videoId:"qWR7TNxuwT0"},
+  {name:"Cable Preacher Curl Single Arm",muscle:"Biceps",videoId:"RC-W-huYx5E"},
+  {name:"Cable Cuffed Bicep Curl Single Arm",muscle:"Biceps",videoId:"-ao8qFfIhpk"},
+  {name:"Cable Cuffed Pronated Biceps Curl Single Arm",muscle:"Biceps",videoId:"S5TjS5a4DLI"},
+  {name:"Cable Cuffed Neutral Biceps Curl Single Arm",muscle:"Biceps",videoId:"Nqc4xAIPZD8"},
+  {name:"Cable High Cable Curl Single Arm",muscle:"Biceps",videoId:"_axItw1wm34"},
+  {name:"Cable Straight Bar Pronated Curl",muscle:"Biceps",videoId:"smmm4GOjzR0"},
+  {name:"Cable Straight Bar Supinated Curl",muscle:"Biceps",videoId:"42sfImEL3Ac"},
+  {name:"DB Single Arm Biceps Curl",muscle:"Biceps",videoId:"lC5mMqCCRCI"},
+  {name:"DB Single Arm Preacher Curl",muscle:"Biceps",videoId:"ypGeFn3doTA"},
+  {name:"DB Incline Bicep Curl",muscle:"Biceps",videoId:"EJmnroc5eDs"},
+  {name:"DB Low Incline Bicep Curl",muscle:"Biceps",videoId:"9fT3Xe9dQTg"},
+  {name:"DB Standing Bicep Curl",muscle:"Biceps",videoId:"SyaTk9qiNDE"},
+  {name:"DB Standing Hammer Curl",muscle:"Biceps",videoId:"AplU8b7Q-iY"},
+  {name:"Barbell Bicep Curl",muscle:"Biceps",videoId:"4TYhorUqM-8"},
+  {name:"Barbell Reverse Curl",muscle:"Biceps",videoId:"4-ePhhKd4Ic"},
+  {name:"Machine Preacher Curl",muscle:"Biceps",videoId:"YHr__7YN4pA"},
+  {name:"Machine Preacher Curl Single Arm",muscle:"Biceps",videoId:"JJQsN_yLqOo"},
+  {name:"Seated DB Bicep Curl Zottman",muscle:"Biceps",videoId:"DkoTHQOR_Dk"},
+  {name:"Seated DB Bicep Curl Alt Zottman",muscle:"Biceps",videoId:"1ULDMeXEQHs"},
+  {name:"Standing DB Bicep Curl Zottman",muscle:"Biceps",videoId:"QDBvdUmU_KE"},
+  {name:"Standing DB Bicep Curl Alt Zottman",muscle:"Biceps",videoId:"fqlr7r0vNPI"},
+  {name:"Incline Lying DB Bicep Spider Curl",muscle:"Biceps",videoId:"EZuI_uZaguk"},
+  {name:"Incline Lying BB Straight Bar Bicep Spider Curl",muscle:"Biceps",videoId:"WrSjoVyRh_o"},
+  {name:"Incline Lying BB Hammer Grip Bicep Spider Curl",muscle:"Biceps",videoId:"JalizbcJ9sw"},
+  {name:"Incline Lying EZ Bar Bicep Spider Curl",muscle:"Biceps",videoId:"LB9488IsHoE"},
+  {name:"Seated DB Bicep Curl Hammer Grip",muscle:"Biceps",videoId:"vvPidEVjML4"},
+  {name:"Seated DB Bicep Curl Alt Hammer",muscle:"Biceps",videoId:"TryEGL03rik"},
+  {name:"Standing DB Bicep Curl Alt Hammer",muscle:"Biceps",videoId:"nPpDlM3tNZY"},
+  {name:"Seated DB Bicep Curl Alt Supinated Grip",muscle:"Biceps",videoId:"wcQUgdjcEIk"},
+  {name:"Seated DB Bicep Curl Reverse Grip",muscle:"Biceps",videoId:"DQOzHKRgvv4"},
+  {name:"Seated DB Bicep Curl Alt Reverse Grip",muscle:"Biceps",videoId:"rAyu1CTR0vQ"},
+  {name:"Seated DB Bicep Curl With Rotation",muscle:"Biceps",videoId:"jVRHReQEDOY"},
+  {name:"Seated DB Bicep Curl Alt With Rotation",muscle:"Biceps",videoId:"aaEk7j0M7CY"},
+  {name:"Standing DB Bicep Curl With Rotation",muscle:"Biceps",videoId:"IacowvIqWaw"},
+  {name:"Standing DB Bicep Curl Alt With Rotation",muscle:"Biceps",videoId:"-xc-rLNFWzw"},
+  // TRICEPS
+  {name:"Cable Cross Tricep Extension Kneeling",muscle:"Triceps",videoId:"yLckN8Hb7Lo"},
+  {name:"Cable Cross Tricep Extension Seated",muscle:"Triceps",videoId:"2qI7a-cyV6Q"},
+  {name:"Cable Cross Tricep Extension Standing",muscle:"Triceps",videoId:"damc19oAyXw"},
+  {name:"Cable Overhead Cross Tricep Extension",muscle:"Triceps",videoId:"ejByk1nd7c8"},
+  {name:"Cable Seated Overhead Cross Tricep Extension",muscle:"Triceps",videoId:"kkiPWK9dsok"},
+  {name:"Cable Tricep Extension Single Arm",muscle:"Triceps",videoId:"byVHzxzAmLE"},
+  {name:"Cable Overhead Tricep Extension Single Arm",muscle:"Triceps",videoId:"B4z1Lpu0J4c"},
+  {name:"Cable Overhead Max Shoulder Flexion Tricep Extension",muscle:"Triceps",videoId:"JxtcLtOV8bk"},
+  {name:"Cable Arm Raised Tricep Extension Single Arm",muscle:"Triceps",videoId:"YFlDh2V6OLI"},
+  {name:"Cable Arm Raised Externally Rotated Tricep Extension",muscle:"Triceps",videoId:"0XMoGFL17wY"},
+  {name:"Cable Arm Raised Tricep Press Single Arm",muscle:"Triceps",videoId:"eeIQrMuXMv0"},
+  {name:"Long Rope Overhead Tricep Extension",muscle:"Triceps",videoId:"je0fpOd0sPE"},
+  {name:"Rope Tricep Extension",muscle:"Triceps",videoId:"Ly-ys_WD9pY"},
+  {name:"Long Rope Tricep Extension",muscle:"Triceps",videoId:"2nkdUG_ftf8"},
+  {name:"DB Flat Tricep Extension",muscle:"Triceps",videoId:"ayenbWyhLOI"},
+  {name:"DB Incline Tricep Extension",muscle:"Triceps",videoId:"7EUAKfWNYWI"},
+  {name:"DB Single Arm Cross Body Tricep Extension",muscle:"Triceps",videoId:"kkn2udMZPNA"},
+  {name:"DB Standing Tricep Extension Single Arm",muscle:"Triceps",videoId:"EHdkq1XSstE"},
+  {name:"Barbell Skull Crusher",muscle:"Triceps",videoId:"GGUn4fjAgNs"},
+  {name:"Hammer Bar Tricep Skull Crusher",muscle:"Triceps",videoId:"fVxlH4hFwXc"},
+  {name:"Incline Hammer Bar Tricep Skull Crusher",muscle:"Triceps",videoId:"Cffas1cIKEk"},
+  {name:"Decline Hammer Bar Tricep Skull Crusher",muscle:"Triceps",videoId:"LjqzNy-tb5c"},
+  {name:"JM Press",muscle:"Triceps",videoId:"kHk24rdl10g"},
+  // FOREARMS
+  {name:"Barbell Wrist Extension",muscle:"Forearms",videoId:"RHgTOhp1tVk"},
+  {name:"Barbell Wrist Flexion",muscle:"Forearms",videoId:"4LpD0TTjixY"},
+  // LEGS
+  {name:"Barbell Back Squat",muscle:"Legs",videoId:"9avjOvHOWuY"},
+  {name:"Barbell Box Squat",muscle:"Legs",videoId:"nCfAD53Fp1c"},
+  {name:"Barbell Front Squat",muscle:"Legs",videoId:"uRiOKk5NwrY"},
+  {name:"Barbell Zercher Squat",muscle:"Legs",videoId:"mvuaShVatIU"},
+  {name:"Goblet Squat",muscle:"Legs",videoId:"0bdimedtol8"},
+  {name:"Heel Floating Body Weight Squat",muscle:"Legs",videoId:"VoKjjDS07eM"},
+  {name:"Heel Floating DB Squat",muscle:"Legs",videoId:"UUigvbItgBg"},
+  {name:"Heel Floating B Stance Body Weight Squat",muscle:"Legs",videoId:"7cLyjSdMqVI"},
+  {name:"Heel Floating B Stance DB Squat",muscle:"Legs",videoId:"Q2vm2ILyKbg"},
+  {name:"Heel Floating Goblet Squat",muscle:"Legs",videoId:"_hW-KiqGizI"},
+  {name:"Heel Floating B Stance Goblet DB Squat",muscle:"Legs",videoId:"Xrn0rQsOuRc"},
+  {name:"45 Degree Hip Extension",muscle:"Legs",videoId:"gnHDn89wjtw"},
+  {name:"45 Degree Hip Extension Single Leg",muscle:"Legs",videoId:"woFD3uRjtlY"},
+  {name:"45 Degree Hip Extension Rounded Back",muscle:"Legs",videoId:"dyHf3aq_gzQ"},
+  {name:"45 Degree Hip Extension + BB",muscle:"Legs",videoId:"zB6RcQjpeZc"},
+  {name:"45 Degree Hip Extension + Plate",muscle:"Legs",videoId:"0ht2Q-ZzgE4"},
+  {name:"45 Degree Hip Extension + DBs",muscle:"Legs",videoId:"SCZFqDHNNvE"},
+  {name:"60 Degree Hip Extension",muscle:"Legs",videoId:"7ewsBL6kaIQ"},
+  {name:"Dumbbell RDL",muscle:"Legs",videoId:"Ph6B6WZLOwc"},
+  {name:"DB B Stance RDL",muscle:"Legs",videoId:"ijwbI6V3k7M"},
+  {name:"DB B Stance RDL Opposite Hand",muscle:"Legs",videoId:"mKUm2uYmmV4"},
+  {name:"Single Leg Dumbbell RDL",muscle:"Legs",videoId:"wiD6wS4D_G0"},
+  {name:"B Stance Cable RDL",muscle:"Legs",videoId:"QgHzxEeI9JE"},
+  {name:"Single Leg Cable RDL",muscle:"Legs",videoId:"yo7w1v2DFKY"},
+  {name:"Barbell RDL",muscle:"Legs",videoId:"jijUDItTmvQ"},
+  {name:"Barbell B Stance RDL",muscle:"Legs",videoId:"TjGM-9ugp50"},
+  {name:"Snatch Grip BB RDL",muscle:"Legs",videoId:"oWz_yGexpeU"},
+  {name:"Good Morning",muscle:"Legs",videoId:"ma0aIt3EmXA"},
+  {name:"Heel Floating RDL",muscle:"Legs",videoId:"Rd5Jin6wcIA"},
+  {name:"Heel Floating RDL B Stance",muscle:"Legs",videoId:"4JSN8b_OVtc"},
+  {name:"Heel Floating RDL B Stance With Internal Rotation",muscle:"Legs",videoId:"3WO7MwQdObg"},
+  {name:"Kettlebell Swing",muscle:"Legs",videoId:"suYkMy5laDk"},
+  {name:"Kettlebell Swing Single Arm",muscle:"Legs",videoId:"GW1A5bT1_vI"},
+  {name:"Kettlebell Swing Alt Arm",muscle:"Legs",videoId:"fup8ODM9VGg"},
+  {name:"Kettlebell Swing Partner Spiked",muscle:"Legs",videoId:"UZWLCq1jeog"},
+  {name:"Pin Loaded Leg Press",muscle:"Legs",videoId:"LxysHxwuPZM"},
+  {name:"Pin Loaded B-Stance Leg Press",muscle:"Legs",videoId:"DrtAOJMInzc"},
+  {name:"Hack Squat",muscle:"Legs",videoId:"I3fwu8qr40w"},
+  {name:"Pendulum Squat Banded",muscle:"Legs",videoId:"6CS_9eEKUos"},
+  {name:"Pendulum Squat Counter Weight Banded",muscle:"Legs",videoId:"uLzcRLMyW_8"},
+  {name:"Plate Loaded Leg Press",muscle:"Legs",videoId:"mvicUTF3rK4"},
+  {name:"Plate Loaded Leg Press Single Leg",muscle:"Legs",videoId:"8o0hUYI1LfQ"},
+  {name:"Plate Loaded Leg Press Banded",muscle:"Legs",videoId:"c1PFbjcGCes"},
+  {name:"Plate Loaded Leg Press Heel Elevated",muscle:"Legs",videoId:"2raO5BkqX1o"},
+  {name:"Barbell Split Squat",muscle:"Legs",videoId:"gF1DnnOdUyM"},
+  {name:"Barbell Split Squat Short Stance",muscle:"Legs",videoId:"Wb1sBENr9Co"},
+  {name:"Barbell Split Squat Long Stance",muscle:"Legs",videoId:"SRUOiFRaTPg"},
+  {name:"Barbell Forward Lunge",muscle:"Legs",videoId:"7T1E-8MNcow"},
+  {name:"Barbell Reverse Lunge",muscle:"Legs",videoId:"ruAyVty51Ik"},
+  {name:"Bulgarian Split Squat",muscle:"Legs",videoId:"fkwU0kyaFV4"},
+  {name:"DB Split Squat",muscle:"Legs",videoId:"_IjG5HvcV60"},
+  {name:"DB Split Squat Opposite Hand",muscle:"Legs",videoId:"KO5WUCMvurc"},
+  {name:"DB Split Squat Same Side",muscle:"Legs",videoId:"AhWGknApxwE"},
+  {name:"DB Split Squat Quad Focus",muscle:"Legs",videoId:"vJ37-22Jn9w"},
+  {name:"Split Squat Front Foot Elevated Bodyweight",muscle:"Legs",videoId:"AjNLYt6oXkw"},
+  {name:"Split Squat Front Foot Elevated DB",muscle:"Legs",videoId:"qsHR_o1LkAM"},
+  {name:"Split Squat Front Foot Elevated Opposite Hand",muscle:"Legs",videoId:"BgNrtCIuxU4"},
+  {name:"Split Squat Front Foot Elevated Same Side",muscle:"Legs",videoId:"UieBhz7MIWA"},
+  {name:"Forward Lunge",muscle:"Legs",videoId:"ss9pUVAOTEs"},
+  {name:"Forward Lunge Onto a Step",muscle:"Legs",videoId:"WcVDaSGQONU"},
+  {name:"Lateral Lunge",muscle:"Legs",videoId:"zvEC981HKtU"},
+  {name:"Reverse Lunge",muscle:"Legs",videoId:"PLl0Eu6FBqo"},
+  {name:"Reverse Lunge Off Step",muscle:"Legs",videoId:"6GQf8gtY1Io"},
+  {name:"Curtsy Lunge",muscle:"Legs",videoId:"NKRGYxskgw0"},
+  {name:"Jump Lunge",muscle:"Legs",videoId:"8r1grD7TdH4"},
+  {name:"Barbell Step Up",muscle:"Legs",videoId:"Y0u6MQyMsBc"},
+  {name:"Step Up",muscle:"Legs",videoId:"MlyWTNP80bo"},
+  {name:"High Step Up",muscle:"Legs",videoId:"-lGMwV_5z8c"},
+  {name:"Lateral Step Up",muscle:"Legs",videoId:"3mUtkVgQTUc"},
+  {name:"Hover Step Up",muscle:"Legs",videoId:"IBCKl-MSguk"},
+  {name:"Hip Adduction Machine",muscle:"Legs",videoId:"64b6PseXwqo"},
+  {name:"Hip Abduction Machine",muscle:"Legs",videoId:"42vua6lVVFI"},
+  {name:"Seated Hamstring Curl",muscle:"Legs",videoId:"viZ6ETIw0Hs"},
+  {name:"Single Leg Seated Hamstring Curl",muscle:"Legs",videoId:"JbhiNSb_Ons"},
+  {name:"Leg Extension",muscle:"Legs",videoId:"Qc2mjG7Y5a8"},
+  {name:"Single Leg Extension",muscle:"Legs",videoId:"jvdwicyKqTM"},
+  {name:"Lying Hamstring Curl",muscle:"Legs",videoId:"VA_bjkDZ_3k"},
+  {name:"Single Leg Lying Hamstring Curl",muscle:"Legs",videoId:"f6y36l5Ol3g"},
+  // GLUTES
+  {name:"Barbell Glute Bridge",muscle:"Glutes",videoId:"4TF4YojHqKU"},
+  {name:"Barbell B Stance Glute Bridge",muscle:"Glutes",videoId:"BM3XxVJ_rjU"},
+  {name:"Barbell Hip Thrust",muscle:"Glutes",videoId:"Kueh1CPzyFk"},
+  {name:"Barbell B Stance Hip Thrust",muscle:"Glutes",videoId:"ijMGKPFg8Ms"},
+  {name:"Standing Cable Glute Kickback Ankle Cuffed",muscle:"Glutes",videoId:"KJVcrzbuiX4"},
+  {name:"Standing High Cable Glute Kickback Ankle Cuffed",muscle:"Glutes",videoId:"kf7T8yj5YfQ"},
+  {name:"Bench Kneeling Cable Glute Kickback",muscle:"Glutes",videoId:"dYhmCJTuNbM"},
+  {name:"Bench Kneeling Cable Glute Kickback High Cable",muscle:"Glutes",videoId:"rW9OLGG5wEs"},
+  {name:"Standing Glute Med Kickback",muscle:"Glutes",videoId:"HIaqRmFSuj0"},
+  {name:"Bench Kneeling Glute Med Kickback",muscle:"Glutes",videoId:"nLle3323EgU"},
+  {name:"Glute Drive Machine",muscle:"Glutes",videoId:"hVa5CWQ47jE"},
+  // CALVES
+  {name:"Seated Calf Raise",muscle:"Calves",videoId:"R7L_W9I86BM"},
+  {name:"Pin Loaded Leg Press Calf Raise",muscle:"Calves",videoId:"R4ZItosNQrM"},
+  {name:"Leg Press Calf Raise",muscle:"Calves",videoId:"KhIH9GQkXjc"},
+  {name:"45 Degree Calf Raise",muscle:"Calves",videoId:"OGmaxiDp3sg"},
+  // CORE
+  {name:"Ab Crunch No Ab Mat",muscle:"Core",videoId:"rZDAfE5NLqo"},
+  {name:"Ab Crunch With Ab Mat",muscle:"Core",videoId:"SQuacZDJvuE"},
+  {name:"Sit Up No Ab Mat",muscle:"Core",videoId:"huWDI6H7fy8"},
+  {name:"Sit Up With Ab Mat",muscle:"Core",videoId:"XtWGjnfdu5o"},
+  {name:"Incline Sit Up",muscle:"Core",videoId:"mkLS3_ZiPEQ"},
+  {name:"Lying 60 Degree Cable Ab Crunch",muscle:"Core",videoId:"-DlxfWMMIe0"},
+  {name:"Cable Rope Crunch",muscle:"Core",videoId:"a8xnJ7W72vk"},
+  {name:"Reverse Ab Crunch With Ab Mat",muscle:"Core",videoId:"sVuzt_fPDLc"},
+  {name:"Reverse Crunch No Ab Mat",muscle:"Core",videoId:"_aQfuDqPcWk"},
+  {name:"Reverse Ab Crunch With Leg Lower With Ab Mat",muscle:"Core",videoId:"ViRKEvxTWVI"},
+  {name:"Reverse Ab Crunch With Leg Lower No Ab Mat",muscle:"Core",videoId:"tN6OnPHmyeU"},
+  {name:"Incline Reverse Ab Crunch",muscle:"Core",videoId:"rqp5QdEC_pg"},
+  {name:"Incline Reverse Ab Crunch With Leg Lower",muscle:"Core",videoId:"Ku11UZVDffc"},
+  {name:"Plank",muscle:"Core",videoId:"GB0HMeek3EQ"},
+  {name:"Plank Pushup Position",muscle:"Core",videoId:"FCmE5yFcLMs"},
+  {name:"Plank Forearm To Full",muscle:"Core",videoId:"_ilDTIYpuc0"},
+  {name:"Plank Kneeling",muscle:"Core",videoId:"7yWibi9LYak"},
+  {name:"Plank Long Lever",muscle:"Core",videoId:"KTZ0iCCokhg"},
+  {name:"Plank With Shoulder Tap",muscle:"Core",videoId:"BtNGsej6nbY"},
+  {name:"Side Plank",muscle:"Core",videoId:"MlsPV2UqFd0"}
+];
+
+var MUSCLE_ORDER=["Chest","Back","Shoulders","Biceps","Triceps","Forearms","Legs","Glutes","Calves","Core"];
+var activeFilter='all';
+var searchQuery='';
+var recentKey='dbb_recent_v1';
+var MAX_RECENT=8;
+
+// Recently Viewed
+function getRecent(){try{return JSON.parse(localStorage.getItem(recentKey)||'[]');}catch(e){return[];}}
+function addRecent(ex){
+  var list=getRecent();
+  list=list.filter(function(x){return x.videoId!==ex.videoId;});
+  list.unshift({name:ex.name,muscle:ex.muscle,videoId:ex.videoId});
+  if(list.length>MAX_RECENT)list=list.slice(0,MAX_RECENT);
+  try{localStorage.setItem(recentKey,JSON.stringify(list));}catch(e){}
+  renderRecent();
+}
+function clearRecent(){try{localStorage.removeItem(recentKey);}catch(e){}renderRecent();}
+function renderRecent(){
+  var list=getRecent();
+  var sec=document.getElementById('rv-section');
+  var strip=document.getElementById('rv-strip');
+  if(!list.length){sec.classList.add('hidden');return;}
+  sec.classList.remove('hidden');
+  strip.innerHTML='';
+  list.forEach(function(ex){
+    var chip=document.createElement('div');
+    chip.className='rv-chip';
+    chip.innerHTML='<img class="rv-thumb" src="https://img.youtube.com/vi/'+ex.videoId+'/mqdefault.jpg" alt="'+ex.name+'" loading="lazy"><span class="rv-name">'+ex.name+'</span>';
+    chip.addEventListener('click',function(){
+      var full=EXERCISES.find(function(e){return e.videoId===ex.videoId;});
+      if(full)openModal(full);
+    });
+    strip.appendChild(chip);
+  });
+}
+
+function getThumb(id){return 'https://img.youtube.com/vi/'+id+'/mqdefault.jpg';}
+function getEmbed(id){return 'https://www.youtube.com/embed/'+id+'?autoplay=1&rel=0';}
+function getYTLink(id){return 'https://www.youtube.com/watch?v='+id;}
+
+function openModal(ex){
+  addRecent(ex);
+  document.getElementById('modal-iframe').src=getEmbed(ex.videoId);
+  document.getElementById('modal-muscle').textContent=ex.muscle;
+  document.getElementById('modal-name').textContent=ex.name;
+  document.getElementById('modal-yt-link').href=getYTLink(ex.videoId);
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(e){if(e.target===document.getElementById('modal'))closeModalBtn();}
+function closeModalBtn(){
+  document.getElementById('modal').classList.remove('open');
+  document.getElementById('modal-iframe').src='';
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModalBtn();});
+
+// Swipe down to close modal on mobile
+var touchStartY=0;
+document.getElementById('modal-box').addEventListener('touchstart',function(e){touchStartY=e.touches[0].clientY;},{passive:true});
+document.getElementById('modal-box').addEventListener('touchend',function(e){
+  if(e.changedTouches[0].clientY-touchStartY>80)closeModalBtn();
+},{passive:true});
+
+function buildCard(ex){
+  var d=document.createElement('div');
+  d.className='card';
+  d.setAttribute('role','button');
+  d.setAttribute('tabindex','0');
+  d.addEventListener('click',function(e){
+    if(e.target.closest('.card-yt'))return;
+    openModal(ex);
+  });
+  d.addEventListener('keydown',function(e){if(e.key==='Enter')openModal(ex);});
+  d.innerHTML=
+    '<div class="card-thumb">'+
+      '<img src="'+getThumb(ex.videoId)+'" alt="'+ex.name+'" loading="lazy">'+
+      '<div class="play-btn"><div class="play-circle"><svg width="14" height="14" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div>'+
+    '</div>'+
+    '<div class="card-body">'+
+      '<div class="card-muscle">'+ex.muscle+'</div>'+
+      '<div class="card-name">'+ex.name+'</div>'+
+      '<a class="card-yt" href="'+getYTLink(ex.videoId)+'" target="_blank" rel="noopener">'+
+        '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>'+
+        'YouTube'+
+      '</a>'+
+    '</div>';
+  return d;
+}
+
+function render(){
+  var wrap=document.getElementById('library-wrap');
+  wrap.innerHTML='';
+  var q=searchQuery.toLowerCase().trim();
+  var filtered=EXERCISES.filter(function(ex){
+    var mok=activeFilter==='all'||ex.muscle===activeFilter;
+    var sok=!q||ex.name.toLowerCase().indexOf(q)!==-1||ex.muscle.toLowerCase().indexOf(q)!==-1;
+    return mok&&sok;
+  });
+  var n=filtered.length;
+  document.getElementById('count').textContent=n;
+  document.getElementById('header-count').textContent=n;
+  if(!n){document.getElementById('no-results').classList.add('show');return;}
+  document.getElementById('no-results').classList.remove('show');
+  var seen={};
+  filtered.forEach(function(ex){seen[ex.muscle]=true;});
+  var muscles=MUSCLE_ORDER.filter(function(m){return seen[m];});
+  muscles.forEach(function(muscle){
+    var group=filtered.filter(function(ex){return ex.muscle===muscle;});
+    var h=document.createElement('div');h.className='section-header';
+    h.innerHTML='<h2>'+muscle+'</h2><span class="count-badge">'+group.length+'</span><div class="section-line"></div>';
+    wrap.appendChild(h);
+    var list=document.createElement('div');list.className='card-list';
+    group.forEach(function(ex){list.appendChild(buildCard(ex));});
+    wrap.appendChild(list);
+  });
+}
+
+document.getElementById('filters').addEventListener('click',function(e){
+  var btn=e.target.closest('.filter-btn');
+  if(!btn)return;
+  document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  activeFilter=btn.getAttribute('data-filter');
+  render();
+});
+
+var st;
+document.getElementById('search').addEventListener('input',function(e){
+  clearTimeout(st);
+  var v=e.target.value;
+  st=setTimeout(function(){searchQuery=v;render();},150);
+});
+
+renderRecent();
+render();
+</script>
+</body>
+</html>
