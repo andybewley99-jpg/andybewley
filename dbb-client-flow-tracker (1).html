@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DBB Client Flow Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0d0d;
+    --surface: #161616;
+    --surface2: #1e1e1e;
+    --border: #2a2a2a;
+    --red: #e8002d;
+    --red-dim: rgba(232,0,45,0.12);
+    --green: #00c47a;
+    --green-dim: rgba(0,196,122,0.12);
+    --amber: #f59e0b;
+    --amber-dim: rgba(245,158,11,0.12);
+    --text: #f0f0f0;
+    --muted: #666;
+    --subtle: #444;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 0 0 60px;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo-mark {
+    width: 36px;
+    height: 36px;
+    background: var(--red);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+  }
+  .header-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .header-title span { color: var(--red); }
+  .header-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    padding: 0 24px;
+  }
+  .tab {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 14px 20px;
+    cursor: pointer;
+    color: var(--muted);
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+  }
+  .tab.active { color: var(--red); border-bottom-color: var(--red); }
+  .tab:hover:not(.active) { color: var(--text); }
+
+  /* MAIN */
+  .main { padding: 24px; max-width: 900px; margin: 0 auto; }
+
+  /* YEAR SELECTOR */
+  .year-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .year-bar label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .year-select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 6px 12px;
+    cursor: pointer;
+    outline: none;
+  }
+  .year-select:focus { border-color: var(--red); }
+
+  /* SUMMARY CARDS */
+  .summary-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .summary-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 18px 20px;
+  }
+  .summary-card .label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .summary-card .value {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 42px;
+    font-weight: 800;
+    line-height: 1;
+  }
+  .summary-card .value.green { color: var(--green); }
+  .summary-card .value.red { color: var(--red); }
+  .summary-card .value.amber { color: var(--amber); }
+  .summary-card .value.neutral { color: var(--text); }
+  .summary-card .sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  /* MONTH GRID */
+  .month-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .month-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 16px 18px;
+    transition: border-color 0.15s;
+  }
+  .month-card:hover { border-color: var(--subtle); }
+  .month-card .month-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .net-badge {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 2px 8px;
+  }
+  .net-badge.pos { background: var(--green-dim); color: var(--green); }
+  .net-badge.neg { background: var(--red-dim); color: var(--red); }
+  .net-badge.zero { background: var(--amber-dim); color: var(--amber); }
+
+  .month-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .input-group label {
+    display: block;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .input-group input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    padding: 8px 10px;
+    outline: none;
+    transition: border-color 0.15s;
+    -moz-appearance: textfield;
+  }
+  .input-group input::-webkit-outer-spin-button,
+  .input-group input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .input-group input:focus { border-color: var(--red); }
+  .input-group.in input:focus { border-color: var(--green); }
+  .input-group.out input:focus { border-color: var(--red); }
+
+  /* QUARTERLY VIEW */
+  .quarter-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .quarter-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 20px;
+  }
+  .quarter-card .q-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+  .quarter-card .q-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+  }
+  .quarter-card .q-months {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .quarter-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+  }
+  .quarter-stat {
+    text-align: center;
+    padding: 0 8px;
+  }
+  .quarter-stat + .quarter-stat { border-left: 1px solid var(--border); }
+  .quarter-stat .qs-label {
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .quarter-stat .qs-val {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1;
+  }
+  .qs-val.green { color: var(--green); }
+  .qs-val.red { color: var(--red); }
+  .qs-val.pos { color: var(--green); }
+  .qs-val.neg { color: var(--red); }
+  .qs-val.zero { color: var(--amber); }
+
+  /* BAR CHART */
+  .chart-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 20px;
+    margin-bottom: 12px;
+  }
+  .chart-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 120px;
+    margin-top: 12px;
+  }
+  .bar-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    height: 100%;
+    justify-content: flex-end;
+  }
+  .bar-stacked {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 2px;
+    height: 100%;
+    align-items: center;
+  }
+  .bar {
+    width: 70%;
+    min-height: 2px;
+    transition: height 0.3s ease;
+  }
+  .bar.in-bar { background: var(--green); }
+  .bar.out-bar { background: var(--red); }
+  .bar-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 4px;
+    white-space: nowrap;
+  }
+
+
+
+  /* HIDDEN */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  @media (max-width: 600px) {
+    .summary-row { grid-template-columns: 1fr 1fr; }
+    .summary-row .summary-card:last-child { grid-column: span 2; }
+    .quarter-grid { grid-template-columns: 1fr; }
+    .month-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo-mark">DBB</div>
+  <div>
+    <div class="header-title">CLIENT <span>FLOW</span> TRACKER</div>
+    <div class="header-sub">Acquisitions vs Churns — Monthly &amp; Quarterly</div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('monthly')">Monthly</button>
+  <button class="tab" onclick="switchTab('quarterly')">Quarterly</button>
+</div>
+
+<div class="main">
+
+  <div class="year-bar">
+    <label>Year</label>
+    <select class="year-select" id="yearSelect" onchange="switchYear()"></select>
+    <button onclick="addYear()" style="background:var(--red);color:#fff;border:none;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;padding:7px 14px;cursor:pointer;letter-spacing:0.5px;">+ ADD YEAR</button>
+  </div>
+
+  <!-- MONTHLY VIEW -->
+  <div class="view active" id="view-monthly">
+    <div class="summary-row" id="monthlySummary"></div>
+    <div class="section-title">Month by Month</div>
+    <div class="month-grid" id="monthGrid"></div>
+  </div>
+
+  <!-- QUARTERLY VIEW -->
+  <div class="view" id="view-quarterly">
+    <div class="summary-row" id="quarterlySummaryTop"></div>
+    <div class="section-title">Quarter Breakdown</div>
+    <div class="quarter-grid" id="quarterGrid"></div>
+    <div class="section-title">Visual Overview</div>
+    <div class="chart-wrap">
+      <div class="section-title" style="margin-bottom:0;">Ins vs Churns by Quarter</div>
+      <div class="chart-bars" id="chartBars"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+var MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var QUARTERS = [
+  { label: 'Q1', months: [0,1,2] },
+  { label: 'Q2', months: [3,4,5] },
+  { label: 'Q3', months: [6,7,8] },
+  { label: 'Q4', months: [9,10,11] }
+];
+
+var currentTab = 'monthly';
+var currentYear = new Date().getFullYear();
+
+function getState() {
+  var raw = localStorage.getItem('dbb_cf_v1');
+  if (!raw) return {};
+  try { return JSON.parse(raw); } catch(e) { return {}; }
+}
+
+function saveState(s) {
+  localStorage.setItem('dbb_cf_v1', JSON.stringify(s));
+}
+
+function getYearData(year) {
+  var s = getState();
+  if (!s[year]) s[year] = { months: {} };
+  return s[year];
+}
+
+function setYearData(year, data) {
+  var s = getState();
+  s[year] = data;
+  saveState(s);
+}
+
+function getMonthData(year, m) {
+  var d = getYearData(year);
+  if (!d.months[m]) d.months[m] = { inn: 0, out: 0 };
+  return d.months[m];
+}
+
+function setMonthData(year, m, inn, out) {
+  var s = getState();
+  if (!s[year]) s[year] = { months: {} };
+  s[year].months[m] = { inn: inn, out: out };
+  saveState(s);
+}
+
+function getYearsList() {
+  var s = getState();
+  var years = Object.keys(s).map(Number);
+  if (years.indexOf(new Date().getFullYear()) === -1) years.push(new Date().getFullYear());
+  years.sort(function(a,b){ return b-a; });
+  return years;
+}
+
+function addYear() {
+  var y = prompt('Enter year to add:');
+  if (!y || isNaN(parseInt(y))) return;
+  y = parseInt(y);
+  var s = getState();
+  if (!s[y]) s[y] = { months: {} };
+  saveState(s);
+  currentYear = y;
+  renderYearSelect();
+  render();
+}
+
+function switchYear() {
+  currentYear = parseInt(document.getElementById('yearSelect').value);
+  render();
+}
+
+function renderYearSelect() {
+  var sel = document.getElementById('yearSelect');
+  var years = getYearsList();
+  sel.innerHTML = '';
+  years.forEach(function(y) {
+    var opt = document.createElement('option');
+    opt.value = y;
+    opt.textContent = y;
+    if (y === currentYear) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(function(t,i) {
+    t.classList.toggle('active', (i === 0 && tab === 'monthly') || (i === 1 && tab === 'quarterly'));
+  });
+  document.getElementById('view-monthly').classList.toggle('active', tab === 'monthly');
+  document.getElementById('view-quarterly').classList.toggle('active', tab === 'quarterly');
+  render();
+}
+
+function netClass(n) {
+  if (n > 0) return 'pos';
+  if (n < 0) return 'neg';
+  return 'zero';
+}
+
+function netSign(n) {
+  if (n > 0) return '+' + n;
+  return '' + n;
+}
+
+function render() {
+  renderYearSelect();
+
+  var startMonth = (currentYear === 2026) ? 3 : 0;
+
+  var totalIn = 0, totalOut = 0;
+  for (var m = startMonth; m < 12; m++) {
+    var md = getMonthData(currentYear, m);
+    totalIn += md.inn;
+    totalOut += md.out;
+  }
+  var totalNet = totalIn - totalOut;
+
+  if (currentTab === 'monthly') renderMonthly(startMonth, totalIn, totalOut, totalNet);
+  if (currentTab === 'quarterly') renderQuarterly(startMonth, totalIn, totalOut, totalNet);
+}
+
+function renderMonthly(startMonth, totalIn, totalOut, totalNet) {
+  var sumEl = document.getElementById('monthlySummary');
+  sumEl.innerHTML =
+    '<div class="summary-card"><div class="label">Total Acquired</div><div class="value green">' + totalIn + '</div><div class="sub">Clients signed ' + currentYear + '</div></div>' +
+    '<div class="summary-card"><div class="label">Total Churned</div><div class="value red">' + totalOut + '</div><div class="sub">Clients lost ' + currentYear + '</div></div>' +
+    '<div class="summary-card"><div class="label">Net Change</div><div class="value ' + (totalNet > 0 ? 'green' : totalNet < 0 ? 'red' : 'amber') + '">' + netSign(totalNet) + '</div><div class="sub">Year to date</div></div>';
+
+  var grid = document.getElementById('monthGrid');
+  grid.innerHTML = '';
+  for (var m = startMonth; m < 12; m++) {
+    (function(month) {
+      var md = getMonthData(currentYear, month);
+      var net = md.inn - md.out;
+      var card = document.createElement('div');
+      card.className = 'month-card';
+      card.innerHTML =
+        '<div class="month-name">' + MONTHS[month] +
+        '<span class="net-badge ' + (net > 0 ? 'pos' : net < 0 ? 'neg' : 'zero') + '">' + netSign(net) + '</span></div>' +
+        '<div class="month-inputs">' +
+        '<div class="input-group in"><label>Acquired</label><input type="number" min="0" id="in_' + month + '" value="' + md.inn + '" placeholder="0" oninput="updateMonth(' + month + ')" /></div>' +
+        '<div class="input-group out"><label>Churned</label><input type="number" min="0" id="out_' + month + '" value="' + md.out + '" placeholder="0" oninput="updateMonth(' + month + ')" /></div>' +
+        '</div>';
+      grid.appendChild(card);
+    })(m);
+  }
+}
+
+function updateMonth(m) {
+  var inn = parseInt(document.getElementById('in_' + m).value) || 0;
+  var out = parseInt(document.getElementById('out_' + m).value) || 0;
+  setMonthData(currentYear, m, inn, out);
+
+  var net = inn - out;
+  var card = document.getElementById('in_' + m).closest('.month-card');
+  var badge = card.querySelector('.net-badge');
+  badge.textContent = netSign(net);
+  badge.className = 'net-badge ' + (net > 0 ? 'pos' : net < 0 ? 'neg' : 'zero');
+
+  var startMonth = (currentYear === 2026) ? 3 : 0;
+  var totalIn = 0, totalOut = 0;
+  for (var i = startMonth; i < 12; i++) {
+    var d = getMonthData(currentYear, i);
+    totalIn += d.inn;
+    totalOut += d.out;
+  }
+  var totalNet = totalIn - totalOut;
+
+  var sumEl = document.getElementById('monthlySummary');
+  sumEl.innerHTML =
+    '<div class="summary-card"><div class="label">Total Acquired</div><div class="value green">' + totalIn + '</div><div class="sub">Clients signed ' + currentYear + '</div></div>' +
+    '<div class="summary-card"><div class="label">Total Churned</div><div class="value red">' + totalOut + '</div><div class="sub">Clients lost ' + currentYear + '</div></div>' +
+    '<div class="summary-card"><div class="label">Net Change</div><div class="value ' + (totalNet > 0 ? 'green' : totalNet < 0 ? 'red' : 'amber') + '">' + netSign(totalNet) + '</div><div class="sub">Year to date</div></div>';
+}
+
+function renderQuarterly(startMonth, totalIn, totalOut, totalNet) {
+  var sumEl = document.getElementById('quarterlySummaryTop');
+  sumEl.innerHTML =
+    '<div class="summary-card"><div class="label">Total Acquired</div><div class="value green">' + totalIn + '</div><div class="sub">Full year ' + currentYear + '</div></div>' +
+    '<div class="summary-card"><div class="label">Total Churned</div><div class="value red">' + totalOut + '</div><div class="sub">Full year ' + currentYear + '</div></div>' +
+    '<div class="summary-card"><div class="label">Net Change</div><div class="value ' + (totalNet > 0 ? 'green' : totalNet < 0 ? 'red' : 'amber') + '">' + netSign(totalNet) + '</div><div class="sub">Year to date</div></div>';
+
+  var qGrid = document.getElementById('quarterGrid');
+  qGrid.innerHTML = '';
+  var qTotals = [];
+
+  QUARTERS.forEach(function(q) {
+    var qIn = 0, qOut = 0;
+    var activeMonths = q.months.filter(function(m){ return m >= startMonth; });
+    activeMonths.forEach(function(m) {
+      var md = getMonthData(currentYear, m);
+      qIn += md.inn;
+      qOut += md.out;
+    });
+    var qNet = qIn - qOut;
+    qTotals.push({ inn: qIn, out: qOut, net: qNet });
+
+    if (activeMonths.length === 0) return;
+
+    var monthNames = activeMonths.map(function(m){ return MONTHS_SHORT[m]; }).join(', ');
+    var card = document.createElement('div');
+    card.className = 'quarter-card';
+    card.innerHTML =
+      '<div class="q-header"><div><div class="q-name">' + q.label + '</div><div class="q-months">' + monthNames + '</div></div>' +
+      '<span class="net-badge ' + (qNet > 0 ? 'pos' : qNet < 0 ? 'neg' : 'zero') + '">' + netSign(qNet) + '</span></div>' +
+      '<div class="quarter-stats">' +
+      '<div class="quarter-stat"><div class="qs-label">Acquired</div><div class="qs-val green">' + qIn + '</div></div>' +
+      '<div class="quarter-stat"><div class="qs-label">Churned</div><div class="qs-val red">' + qOut + '</div></div>' +
+      '<div class="quarter-stat"><div class="qs-label">Net</div><div class="qs-val ' + netClass(qNet) + '">' + netSign(qNet) + '</div></div>' +
+      '</div>';
+    qGrid.appendChild(card);
+  });
+
+  renderChart(qTotals.filter(function(q, i){ return QUARTERS[i].months.some(function(m){ return m >= startMonth; }); }));
+}
+
+function renderChart(qTotals) {
+  var chartEl = document.getElementById('chartBars');
+  chartEl.innerHTML = '';
+  var maxVal = 1;
+  qTotals.forEach(function(q) { maxVal = Math.max(maxVal, q.inn, q.out); });
+
+  QUARTERS.forEach(function(q, i) {
+    var data = qTotals[i];
+    var inH = Math.round((data.inn / maxVal) * 100);
+    var outH = Math.round((data.out / maxVal) * 100);
+
+    var group = document.createElement('div');
+    group.className = 'bar-group';
+    group.innerHTML =
+      '<div style="display:flex;gap:3px;align-items:flex-end;height:100%;width:100%;justify-content:center;">' +
+      '<div style="display:flex;flex-direction:column;justify-content:flex-end;flex:1;align-items:center;">' +
+      '<div class="bar in-bar" style="height:' + inH + '%;width:80%;"></div>' +
+      '</div>' +
+      '<div style="display:flex;flex-direction:column;justify-content:flex-end;flex:1;align-items:center;">' +
+      '<div class="bar out-bar" style="height:' + outH + '%;width:80%;"></div>' +
+      '</div>' +
+      '</div>' +
+      '<div class="bar-label">' + q.label + '</div>';
+    chartEl.appendChild(group);
+  });
+
+  var legend = document.createElement('div');
+  legend.style.cssText = 'display:flex;gap:16px;margin-top:12px;';
+  legend.innerHTML =
+    '<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)"><div style="width:10px;height:10px;background:var(--green);"></div>Acquired</div>' +
+    '<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)"><div style="width:10px;height:10px;background:var(--red);"></div>Churned</div>';
+  document.querySelector('.chart-wrap').appendChild(legend);
+}
+
+// Init
+(function() {
+  var s = getState();
+  if (Object.keys(s).length === 0) {
+    var init = {};
+    init[currentYear] = { months: {} };
+    saveState(init);
+  }
+  render();
+})();
+</script>
+</body>
+</html>
