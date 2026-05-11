@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DBB Client Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0d0d;
+    --surface: #161616;
+    --surface2: #1e1e1e;
+    --border: #2a2a2a;
+    --red: #e8002d;
+    --yellow: #f5c518;
+    --green: #00c853;
+    --text: #f0f0f0;
+    --text-muted: #666;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--surface);
+    border-bottom: 2px solid var(--red);
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .logo {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .logo span { color: var(--red); }
+
+  .stats { display: flex; gap: 10px; flex-wrap: wrap; }
+  .stat-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .dot-g { background: var(--green); }
+  .dot-y { background: var(--yellow); }
+  .dot-r { background: var(--red); }
+  .dot-n { background: #555; }
+
+  /* TOOLBAR */
+  .toolbar {
+    padding: 12px 28px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+
+  .search-wrap { position: relative; min-width: 160px; }
+  .search-wrap input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 7px 12px 7px 32px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    outline: none;
+    width: 200px;
+    transition: border-color 0.15s;
+  }
+  .search-wrap input:focus { border-color: var(--red); }
+  .search-wrap input::placeholder { color: var(--text-muted); }
+  .search-wrap svg { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
+
+  .toggle-wrap { display: flex; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+  .toggle-btn {
+    padding: 7px 15px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .toggle-btn.active { background: var(--red); color: #fff; }
+
+  .filter-btns { display: flex; gap: 6px; }
+  .filter-btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text-muted);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .filter-btn:hover { color: var(--text); border-color: #444; }
+  .filter-btn.active { background: var(--red); border-color: var(--red); color: #fff; }
+
+  .add-btn {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px;
+    background: var(--red);
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.15s;
+  }
+  .add-btn:hover { opacity: 0.85; }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 580px;
+  }
+
+  thead th {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-align: left;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+  tbody tr:hover { background: #131313; }
+
+  td { padding: 0; vertical-align: middle; }
+
+  /* col sizes */
+  .col-num   { width: 50px; }
+  .col-name  { width: 220px; }
+  .col-light { width: 160px; }
+  .col-notes { }
+  .col-act   { width: 80px; }
+
+  td.col-num {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 12px;
+    padding: 0 8px;
+    border-right: 1px solid var(--border);
+  }
+  td.col-name {
+    padding: 0;
+    border-right: 1px solid var(--border);
+    position: relative;
+  }
+  td.col-light {
+    padding: 0 16px;
+    border-right: 1px solid var(--border);
+  }
+  td.col-notes { padding: 0; border-right: 1px solid var(--border); }
+  td.col-act { padding: 0 12px; }
+
+  /* DATE COLS */
+  .col-start, .col-end, .col-ret { width: 120px; border-right: 1px solid var(--border); }
+  td.col-start, td.col-end, td.col-ret { border-right: 1px solid var(--border); padding: 0 14px; }
+
+  .date-input {
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    outline: none;
+    width: 100%;
+    height: 42px;
+    cursor: pointer;
+    color-scheme: dark;
+  }
+  .date-input::-webkit-calendar-picker-indicator { filter: invert(0.5); cursor: pointer; }
+
+  .ret-val {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+  .ret-val.ret-good { color: var(--green); }
+  .ret-val.ret-mid  { color: var(--yellow); }
+  .ret-val.ret-low  { color: var(--red); }
+
+  /* AVG RETENTION BAR */
+  .avg-bar {
+    padding: 10px 28px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .avg-val {
+    font-size: 16px;
+    color: var(--text);
+    letter-spacing: 1px;
+  }
+  .avg-val span { color: var(--green); }
+
+  /* left status bar on name cell */
+  .name-cell {
+    display: flex;
+    align-items: center;
+    height: 42px;
+    padding: 0 14px;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .name-bar {
+    width: 3px;
+    height: 22px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .bar-green  { background: var(--green); }
+  .bar-yellow { background: var(--yellow); }
+  .bar-red    { background: var(--red); }
+  .bar-none   { background: #333; }
+
+  /* TRAFFIC LIGHTS */
+  .tl-wrap { display: flex; gap: 8px; align-items: center; height: 42px; }
+  .tl {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: transform 0.12s, box-shadow 0.12s, opacity 0.12s;
+  }
+  .tl:hover { transform: scale(1.2); }
+  .tl-r { background: var(--red); }
+  .tl-y { background: var(--yellow); }
+  .tl-g { background: var(--green); }
+  .tl.selected { border-color: #fff; box-shadow: 0 0 0 2px rgba(255,255,255,0.2); transform: scale(1.15); }
+  .tl.dimmed   { opacity: 0.18; }
+
+  .status-text {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    min-width: 60px;
+  }
+  .st-g { color: var(--green); }
+  .st-y { color: var(--yellow); }
+  .st-r { color: var(--red); }
+  .st-n { color: transparent; }
+
+  /* NOTE INPUT */
+  .note-input {
+    display: block;
+    width: 100%;
+    height: 42px;
+    background: transparent;
+    border: none;
+    border-left: none;
+    padding: 0 16px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: background 0.15s;
+  }
+  .note-input::placeholder { color: #3a3a3a; }
+  .note-input:focus { background: #111; }
+
+  /* ROW ACTIONS */
+  .row-acts {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    height: 42px;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  tr:hover .row-acts { opacity: 1; }
+  .rbt {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-family: 'DM Sans', sans-serif;
+    padding: 0;
+    transition: color 0.15s;
+    white-space: nowrap;
+  }
+  .rbt:hover { color: var(--text); }
+  .rbt.del:hover { color: var(--red); }
+
+  /* EMPTY */
+  .empty-row td {
+    text-align: center;
+    padding: 60px;
+    color: var(--text-muted);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* MODAL */
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+  .overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--red);
+    border-radius: 12px;
+    padding: 28px;
+    width: 100%;
+    max-width: 380px;
+  }
+  .modal h2 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+  }
+  .field { margin-bottom: 14px; }
+  .field label {
+    display: block;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .field input, .field textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .field input:focus, .field textarea:focus { border-color: var(--red); }
+  .field textarea { resize: vertical; min-height: 70px; }
+
+  .spick-wrap { display: flex; gap: 8px; }
+  .spick {
+    flex: 1;
+    padding: 8px 4px;
+    border-radius: 6px;
+    border: 2px solid var(--border);
+    background: var(--surface2);
+    color: var(--text-muted);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+  }
+  .spick.pg.active  { border-color: var(--green);  color: var(--green);  background: rgba(0,200,83,0.08); }
+  .spick.py.active  { border-color: var(--yellow); color: var(--yellow); background: rgba(245,197,24,0.08); }
+  .spick.pr.active  { border-color: var(--red);    color: var(--red);    background: rgba(232,0,45,0.08); }
+
+  .modal-btns { display: flex; gap: 10px; margin-top: 20px; }
+  .m-save {
+    flex: 1; padding: 9px;
+    background: var(--red); border: none; border-radius: 6px;
+    color: #fff;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    cursor: pointer; transition: opacity 0.15s;
+  }
+  .m-save:hover { opacity: 0.85; }
+  .m-cancel {
+    padding: 9px 16px;
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text-muted);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">DBB <span>Client</span> Tracker</div>
+  <div class="stats">
+    <div class="stat-pill"><span class="dot dot-g"></span><span id="cG">0</span>&nbsp;On track</div>
+    <div class="stat-pill"><span class="dot dot-y"></span><span id="cY">0</span>&nbsp;Flagged</div>
+    <div class="stat-pill"><span class="dot dot-r"></span><span id="cR">0</span>&nbsp;At risk</div>
+    <div class="stat-pill"><span class="dot dot-n"></span><span id="cT">0</span>&nbsp;Total live</div>
+  </div>
+</header>
+
+<div class="toolbar">
+  <div class="search-wrap">
+    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" id="search" placeholder="Search..." oninput="render()">
+  </div>
+  <div class="toggle-wrap">
+    <button class="toggle-btn active" onclick="setView('live',this)">Live</button>
+    <button class="toggle-btn" onclick="setView('past',this)">Past</button>
+  </div>
+  <div class="filter-btns">
+    <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+    <button class="filter-btn" onclick="setFilter('green',this)">🟢 On track</button>
+    <button class="filter-btn" onclick="setFilter('yellow',this)">🟡 Flagged</button>
+    <button class="filter-btn" onclick="setFilter('red',this)">🔴 At risk</button>
+  </div>
+  <button class="add-btn" onclick="openModal()">+ Add Client</button>
+</div>
+
+<div class="avg-bar">
+  Avg retention (clients with dates): <span class="avg-val" id="avgRet"><span>—</span></span>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th class="col-num">#</th>
+        <th class="col-name">Client</th>
+        <th class="col-light">Status</th>
+        <th class="col-start">Start Date</th>
+        <th class="col-end">End Date</th>
+        <th class="col-ret">Retention</th>
+        <th class="col-notes">Notes</th>
+        <th class="col-act"></th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h2>Add Client</h2>
+    <div class="field">
+      <label>Full Name</label>
+      <input type="text" id="mName" placeholder="e.g. Sarah Jones">
+    </div>
+    <div class="field">
+      <label>Status</label>
+      <div class="spick-wrap">
+        <button class="spick pg" onclick="pickStatus('green',this)">🟢 On track</button>
+        <button class="spick py" onclick="pickStatus('yellow',this)">🟡 Flagged</button>
+        <button class="spick pr" onclick="pickStatus('red',this)">🔴 At risk</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Notes (optional)</label>
+      <textarea id="mNotes" placeholder="Opening notes..."></textarea>
+    </div>
+    <div style="display:flex;gap:12px;">
+      <div class="field" style="flex:1">
+        <label>Start Date</label>
+        <input type="date" id="mStart">
+      </div>
+      <div class="field" style="flex:1">
+        <label>End Date</label>
+        <input type="date" id="mEnd">
+      </div>
+    </div>
+    <div class="modal-btns">
+      <button class="m-cancel" onclick="closeModal()">Cancel</button>
+      <button class="m-save" onclick="addClient()">Add Client</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const DEFAULTS = [
+  "Penny Johnson","Nadia Hill","Alexandra Moriarty","Adam Bentley","Jilly Silvera",
+  "Stacey Mackinnon","Adele Benham","Gabrielle Chase","Hannah Lester","Pav Zigova",
+  "Harriet Grace Richardson","Amie Jane Teasdale","Sarah Cleary","Aimee Duckers",
+  "Milly Parkinson","Beth Owen","Alex Ellis","Melanie Brenland","Sasha Matthewman",
+  "Shula Larton","Colleen Daniels","Shauna Jordan","Joe Bateman","Casha Hooper",
+  "Sophie Allen","Chris Jordan","Amy Sandford","Louise Bennet","Ayesha Siddiqua",
+  "Georgina Peate","Calum Jones","Mark Lim","Dana Hughes","Daniel Zigo",
+  "Caitlin McKernan","Amy Franks","Jaz Singh Kang","Hannah Cronje",
+  "Elizabeth Hoefsmit","Evie Baldacchino","Rhys Pomeroy","Hannah Mason-Dodd",
+  "Michael Perkins","Michelle Stevens","Melissa Whittingham","Callum Smith",
+  "Alana Lorente","Ian Rawlins","Amy George","Kirstie Flemming","Matthew Westwood",
+  "Chanell De-Gannes","Eloise Boye","Laura Guerin","Demi Kemp","Tom Jones",
+  "Dan Clarke","Chelsea Lashbrook","Sam Wright","Kady Sullivan","Hollie Smith",
+  "Robyn Whorton","Tracy Turcsanyi","Victoria Filmer","Sara Hughes","Rachel Branson",
+  "Gabrielle Kewin","Ryan McKinney","Molly Robin","Jen Mugford","Tom Mugford"
+];
+
+function load() {
+  // try current key first
+  const s4 = localStorage.getItem('dbb_v4');
+  if (s4) { try { return JSON.parse(s4); } catch(e) {} }
+  // migrate from v3
+  const s3 = localStorage.getItem('dbb_v3');
+  if (s3) {
+    try {
+      const old = JSON.parse(s3);
+      return old.map(c => ({ startDate: '', endDate: '', ...c }));
+    } catch(e) {}
+  }
+  // migrate from v2
+  const s2 = localStorage.getItem('dbb_v2');
+  if (s2) {
+    try {
+      const old = JSON.parse(s2);
+      return old.map(c => ({ startDate: '', endDate: '', ...c }));
+    } catch(e) {}
+  }
+  // fresh defaults
+  return DEFAULTS.map((name,i) => ({ id: i+1, name, status: 'none', notes: '', live: true, startDate: '', endDate: '' }));
+}
+function save() { localStorage.setItem('dbb_v4', JSON.stringify(clients)); }
+
+let clients = load();
+let view = 'live', filter = 'all', mStatus = 'none';
+let nextId = Math.max(...clients.map(c => c.id), 0) + 1;
+
+function setView(v, btn) {
+  view = v;
+  document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+function setFilter(f, btn) {
+  filter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+const ST = {
+  green:  { text: 'On track', tc: 'st-g', bar: 'bar-green' },
+  yellow: { text: 'Flagged',   tc: 'st-y', bar: 'bar-yellow' },
+  red:    { text: 'At risk',  tc: 'st-r', bar: 'bar-red' },
+  none:   { text: '',         tc: 'st-n', bar: 'bar-none' },
+};
+
+function calcWeeks(start, end) {
+  if (!start) return null;
+  const s = new Date(start);
+  const e = end ? new Date(end) : new Date();
+  const diff = Math.round((e - s) / (1000 * 60 * 60 * 24 * 7));
+  return diff > 0 ? diff : null;
+}
+
+function retLabel(weeks) {
+  if (weeks === null) return { text: '—', cls: '' };
+  if (weeks >= 20) return { text: weeks + 'w', cls: 'ret-good' };
+  if (weeks >= 12) return { text: weeks + 'w', cls: 'ret-mid' };
+  return { text: weeks + 'w', cls: 'ret-low' };
+}
+
+function updateAvg() {
+  const withDates = clients.filter(c => c.startDate);
+  if (!withDates.length) { document.getElementById('avgRet').innerHTML = '<span>—</span>'; return; }
+  const total = withDates.reduce((sum, c) => sum + (calcWeeks(c.startDate, c.endDate) || 0), 0);
+  const avg = Math.round(total / withDates.length);
+  document.getElementById('avgRet').innerHTML = `<span>${avg} weeks</span> across ${withDates.length} client${withDates.length !== 1 ? 's' : ''}`;
+}
+
+
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function render() {
+  const q = document.getElementById('search').value.toLowerCase().trim();
+  const live = clients.filter(c => c.live);
+  document.getElementById('cG').textContent = live.filter(c => c.status==='green').length;
+  document.getElementById('cY').textContent = live.filter(c => c.status==='yellow').length;
+  document.getElementById('cR').textContent = live.filter(c => c.status==='red').length;
+  document.getElementById('cT').textContent = live.length;
+
+  const vis = clients.filter(c => {
+    if (c.live !== (view==='live')) return false;
+    if (filter !== 'all' && c.status !== filter) return false;
+    if (q && !c.name.toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  updateAvg();
+
+  const tbody = document.getElementById('tbody');
+  if (!vis.length) {
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="8">No clients found</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = vis.map((c,i) => {
+    const st = ST[c.status];
+    const lights = ['red','yellow','green'].map(col => {
+      const cls = [
+        'tl',
+        col==='red' ? 'tl-r' : col==='yellow' ? 'tl-y' : 'tl-g',
+        c.status===col ? 'selected' : (c.status!=='none' && c.status!==col ? 'dimmed' : '')
+      ].join(' ');
+      return `<span class="${cls}" onclick="setStatus(${c.id},'${col}')"></span>`;
+    }).join('');
+    const weeks = calcWeeks(c.startDate, c.endDate);
+    const ret = retLabel(weeks);
+    const archLabel = c.live ? 'Archive' : 'Restore';
+
+    return `
+    <tr>
+      <td class="col-num">${i+1}</td>
+      <td class="col-name">
+        <div class="name-cell">
+          <span class="name-bar ${st.bar}"></span>
+          ${esc(c.name)}
+        </div>
+      </td>
+      <td class="col-light">
+        <div class="tl-wrap">
+          ${lights}
+          <span class="status-text ${st.tc}">${st.text}</span>
+        </div>
+      </td>
+      <td class="col-start">
+        <input class="date-input" type="date" data-id="${c.id}" data-field="startDate" value="${c.startDate||''}">
+      </td>
+      <td class="col-end">
+        <input class="date-input" type="date" data-id="${c.id}" data-field="endDate" value="${c.endDate||''}">
+      </td>
+      <td class="col-ret">
+        <span class="ret-val ${ret.cls}">${ret.text}</span>
+      </td>
+      <td class="col-notes">
+        <input class="note-input" data-id="${c.id}" value="${esc(c.notes)}" placeholder="Add a note...">
+      </td>
+      <td class="col-act">
+        <div class="row-acts">
+          <button class="rbt" onclick="toggleLive(${c.id})">${archLabel}</button>
+          <button class="rbt del" onclick="del(${c.id})">✕</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  tbody.querySelectorAll('.note-input').forEach(inp => {
+    inp.addEventListener('input', e => {
+      const c = clients.find(x => x.id === parseInt(e.target.dataset.id));
+      if (c) { c.notes = e.target.value; save(); }
+    });
+  });
+
+  tbody.querySelectorAll('.date-input').forEach(inp => {
+    inp.addEventListener('change', e => {
+      const c = clients.find(x => x.id === parseInt(e.target.dataset.id));
+      if (c) { c[e.target.dataset.field] = e.target.value; save(); render(); }
+    });
+  });
+}
+
+function setStatus(id, s) {
+  const c = clients.find(x => x.id===id);
+  if (!c) return;
+  c.status = c.status===s ? 'none' : s;
+  save(); render();
+}
+function toggleLive(id) {
+  const c = clients.find(x => x.id===id);
+  if (!c) return;
+  c.live = !c.live;
+  save(); render();
+}
+function del(id) {
+  if (!confirm('Remove this client? Cannot be undone.')) return;
+  clients = clients.filter(x => x.id!==id);
+  save(); render();
+}
+
+function openModal() {
+  mStatus = 'none';
+  document.getElementById('mName').value = '';
+  document.getElementById('mNotes').value = '';
+  document.getElementById('mStart').value = '';
+  document.getElementById('mEnd').value = '';
+  document.querySelectorAll('.spick').forEach(b => b.classList.remove('active'));
+  document.getElementById('overlay').classList.add('open');
+  setTimeout(() => document.getElementById('mName').focus(), 50);
+}
+function closeModal() { document.getElementById('overlay').classList.remove('open'); }
+function pickStatus(s, btn) {
+  mStatus = s;
+  document.querySelectorAll('.spick').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function addClient() {
+  const name = document.getElementById('mName').value.trim();
+  if (!name) { document.getElementById('mName').focus(); return; }
+  clients.unshift({
+    id: nextId++, name, status: mStatus,
+    notes: document.getElementById('mNotes').value.trim(),
+    startDate: document.getElementById('mStart').value,
+    endDate: document.getElementById('mEnd').value,
+    live: view==='live'
+  });
+  save(); closeModal(); render();
+}
+
+document.getElementById('overlay').addEventListener('click', e => { if (e.target===e.currentTarget) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); });
+
+render();
+</script>
+</body>
+</html>
