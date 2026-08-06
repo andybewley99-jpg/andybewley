@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dream Self Deep-Dive | Dream Body Blueprint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  :root{
+    --bg:#0d0d0d;
+    --bg-raised:#161616;
+    --bg-card:#1b1b1b;
+    --line:#2a2a2a;
+    --red:#e2262c;
+    --red-dim:#7a1418;
+    --text:#f2f0ec;
+    --text-dim:#9a9a94;
+    --gold:#d8b978;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'DM Sans',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  h1,h2,h3,.display{
+    font-family:'Barlow Condensed',sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+    font-weight:700;
+    margin:0;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:28px 20px 120px;}
+
+  /* ---------- INTRO ---------- */
+  .intro{padding:64px 0 20px;text-align:center;}
+  .intro .eyebrow{
+    color:var(--gold);
+    font-family:'Barlow Condensed',sans-serif;
+    letter-spacing:0.35em;
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+  }
+  .intro .eyebrow::before,.intro .eyebrow::after{
+    content:"";
+    height:1px;
+    width:28px;
+    background:linear-gradient(90deg, transparent, var(--gold));
+  }
+  .intro .eyebrow::after{background:linear-gradient(90deg, var(--gold), transparent);}
+  .intro h1{
+    font-family:'Anton',sans-serif;
+    font-weight:400;
+    font-size:58px;
+    line-height:0.92;
+    letter-spacing:0.01em;
+    margin:16px 0 20px;
+    color:var(--text);
+  }
+  .intro h1 span{
+    display:inline-block;
+    background:linear-gradient(100deg, #ff5158 0%, var(--gold) 35%, #ff5158 60%, var(--gold) 100%);
+    background-size:250% auto;
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+    color:transparent;
+    animation:shimmer 5s linear infinite;
+  }
+  @keyframes shimmer{
+    0%{background-position:0% center;}
+    100%{background-position:250% center;}
+  }
+  .intro p{color:var(--text-dim);font-size:16px;line-height:1.6;max-width:520px;margin:0 auto 30px;}
+
+  .steps{
+    max-width:560px;
+    margin:10px auto 40px;
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+  }
+  .step{
+    display:flex;
+    align-items:flex-start;
+    gap:18px;
+    background:var(--bg-card);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:20px 22px;
+    text-align:left;
+  }
+  .step-num{
+    font-family:'Anton',sans-serif;
+    font-weight:400;
+    font-size:30px;
+    color:var(--gold);
+    flex:0 0 auto;
+    line-height:1;
+    min-width:40px;
+  }
+  .step-title{
+    font-family:'Barlow Condensed',sans-serif;
+    font-weight:700;
+    font-size:18px;
+    letter-spacing:0.02em;
+    text-transform:uppercase;
+    color:var(--text);
+    margin-bottom:4px;
+  }
+  .step-desc{
+    font-size:14px;
+    line-height:1.5;
+    color:var(--text-dim);
+  }
+  .rule{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:30px 0;}
+  .btn{
+    position:relative;
+    background:linear-gradient(155deg, #ff3339 0%, var(--red) 55%, #b8161c 100%);
+    color:#fff;
+    border:none;
+    font-family:'Barlow Condensed',sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    font-weight:700;
+    font-size:16px;
+    padding:16px 34px;
+    border-radius:6px;
+    cursor:pointer;
+    overflow:hidden;
+    box-shadow:0 4px 18px rgba(226,38,44,0.28), inset 0 1px 0 rgba(255,255,255,0.18);
+    transition:transform .12s ease, box-shadow .18s ease;
+  }
+  .btn::after{
+    content:"";
+    position:absolute;
+    top:0; left:-60%;
+    width:40%; height:100%;
+    background:linear-gradient(115deg, transparent, rgba(255,255,255,0.35), transparent);
+    transform:skewX(-20deg);
+    transition:left .55s ease;
+  }
+  .btn:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(226,38,44,0.4), inset 0 1px 0 rgba(255,255,255,0.22);}
+  .btn:hover::after{left:130%;}
+  .btn:active{transform:translateY(0);}
+  .btn.ghost{
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--text);
+    box-shadow:none;
+  }
+  .btn.ghost:hover{border-color:var(--gold);color:var(--gold);background:transparent;}
+  .btn:disabled{opacity:0.35;cursor:not-allowed;transform:none;}
+
+  /* ---------- PROGRESS BAR (sticky) ---------- */
+  .progress-shell{
+    position:sticky;top:0;z-index:20;
+    background:rgba(13,13,13,0.92);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+    padding:14px 20px;
+  }
+  .progress-inner{max-width:760px;margin:0 auto;}
+  .progress-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;}
+  .progress-top .label{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-dim);}
+  .progress-top .count{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:var(--gold);}
+  .progress-track{height:4px;background:var(--line);border-radius:2px;overflow:hidden;}
+  .progress-fill{height:100%;background:linear-gradient(90deg, var(--red), var(--gold));width:0%;transition:width .25s ease;}
+
+  /* ---------- SECTIONS / ACCORDION ---------- */
+  .section{
+    border:1px solid var(--line);
+    background:var(--bg-card);
+    border-radius:8px;
+    margin-bottom:14px;
+    overflow:hidden;
+  }
+  .section-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:18px 20px;
+    cursor:pointer;
+    user-select:none;
+  }
+  .section-head .num{
+    font-family:'Barlow Condensed',sans-serif;
+    color:var(--red-dim);
+    font-weight:700;
+    font-size:13px;
+    letter-spacing:0.1em;
+    margin-right:10px;
+  }
+  .section-head h2{font-size:22px;letter-spacing:0.02em;}
+  .section-head .meta{display:flex;align-items:center;gap:12px;}
+  .section-head .tally{font-family:'Barlow Condensed',sans-serif;font-size:14px;color:var(--text-dim);white-space:nowrap;}
+  .chev{
+    width:20px;height:20px;flex:0 0 auto;
+    color:var(--text-dim);
+    transition:transform .2s ease;
+  }
+  .section.open .chev{transform:rotate(180deg);color:var(--red);}
+  .section-body{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .35s ease;
+    padding:0 20px;
+  }
+  .section.open .section-body{padding:0 20px 20px;}
+  .q-block{padding:14px 0;border-top:1px solid var(--line);}
+  .q-block:first-child{border-top:1px solid var(--line);}
+  .q-row{display:flex;align-items:flex-start;gap:10px;}
+  .q-text-wrap{flex:1;}
+  .q-text{font-size:15px;line-height:1.45;color:var(--text);padding-top:2px;}
+  .q-hint{font-size:12.5px;line-height:1.4;color:var(--text-dim);margin-top:4px;font-style:italic;}
+  .star-btn{
+    flex:0 0 auto;
+    width:32px;height:32px;
+    border-radius:50%;
+    border:1px solid var(--line);
+    background:transparent;
+    color:var(--text-dim);
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:all .15s ease;
+    margin-top:-2px;
+    position:relative;
+  }
+  .star-btn::before{
+    content:"";
+    position:absolute;
+    inset:-7px;
+  }
+  .star-btn svg{width:15px;height:15px;}
+  .star-btn.active{background:var(--gold);border-color:var(--gold);color:#1b1b1b;}
+  .star-btn:disabled{opacity:0.3;cursor:not-allowed;}
+  .remove-btn{
+    flex:0 0 auto;
+    width:32px;height:32px;
+    border-radius:50%;
+    border:1px solid var(--line);
+    background:transparent;
+    color:var(--text-dim);
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:all .15s ease;
+    margin-top:-2px;
+    position:relative;
+  }
+  .remove-btn::before{
+    content:"";
+    position:absolute;
+    inset:-7px;
+  }
+  .remove-btn svg{width:14px;height:14px;}
+  .remove-btn:hover{border-color:var(--red);color:var(--red);}
+  .custom-q-input{
+    width:100%;
+    background:transparent;
+    border:none;
+    border-bottom:1px solid var(--line);
+    color:var(--text);
+    font-family:'DM Sans',sans-serif;
+    font-size:16px;
+    font-weight:500;
+    padding:2px 0 8px;
+  }
+  .custom-q-input:focus{outline:none;border-color:var(--red);}
+  .custom-q-input::placeholder{color:#5c5c58;}
+  textarea{
+    width:100%;
+    margin-top:10px;
+    background:var(--bg-raised);
+    border:1px solid var(--line);
+    border-radius:6px;
+    color:var(--text);
+    font-family:'DM Sans',sans-serif;
+    font-size:16px;
+    line-height:1.5;
+    padding:11px 12px;
+    resize:vertical;
+    min-height:44px;
+    transition:border-color .15s ease;
+  }
+  textarea:focus{outline:none;border-color:var(--red);}
+  textarea::placeholder{color:#5c5c58;}
+
+  /* ---------- FOOTER ACTIONS ---------- */
+  .footer-actions{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:14px;
+    padding:30px 0 10px;
+    text-align:center;
+  }
+  .footer-actions p{color:var(--text-dim);font-size:14px;max-width:420px;line-height:1.5;}
+
+  /* ---------- EXPORT / SUMMARY VIEW ---------- */
+  #app > .view{display:none;}
+  #app > .view.active{display:block;}
+
+  .export-toolbar{
+    max-width:760px;margin:0 auto 22px;
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
+  }
+  .export-toolbar .back-link{
+    color:var(--text-dim);font-size:14px;cursor:pointer;
+    display:flex;align-items:center;gap:6px;
+  }
+  .export-toolbar .back-link:hover{color:var(--text);}
+  .export-toolbar .actions{display:flex;gap:10px;}
+
+  .stage{
+    display:flex;justify-content:center;padding:10px 20px 60px;
+  }
+  .card{
+    width:100%;
+    max-width:420px;
+    min-height:747px;
+    background:
+      radial-gradient(circle at 20% -10%, #2a1113 0%, transparent 45%),
+      radial-gradient(circle at 100% 110%, #241a08 0%, transparent 40%),
+      #0d0d0d;
+    border:1px solid transparent;
+    background-clip:padding-box;
+    border-radius:22px;
+    padding:36px 30px 30px;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+    overflow:hidden;
+    box-shadow:
+      0 0 0 1px rgba(216,185,120,0.35),
+      0 24px 60px rgba(0,0,0,0.55),
+      inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+  .card::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size:26px 26px;
+    pointer-events:none;
+  }
+  .card::after{
+    content:"";
+    position:absolute;
+    top:-50%; left:-60%;
+    width:45%; height:220%;
+    background:linear-gradient(115deg, transparent, rgba(216,185,120,0.16), transparent);
+    transform:rotate(18deg);
+    animation:cardSheen 6s ease-in-out infinite;
+    pointer-events:none;
+  }
+  @keyframes cardSheen{
+    0%,15%{left:-60%;}
+    50%,100%{left:130%;}
+  }
+  .card-eyebrow{
+    font-family:'Barlow Condensed',sans-serif;
+    color:var(--gold);
+    letter-spacing:0.3em;
+    font-size:11px;
+    font-weight:700;
+    text-align:center;
+    position:relative;
+  }
+  .card-title{
+    font-family:'Anton',sans-serif;
+    font-weight:400;
+    font-size:36px;
+    text-align:center;
+    line-height:0.95;
+    letter-spacing:0.01em;
+    margin-top:10px;
+    position:relative;
+    background:linear-gradient(100deg, #f2f0ec 0%, var(--gold) 45%, #f2f0ec 75%);
+    background-size:220% auto;
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+    color:transparent;
+    animation:shimmer 7s linear infinite;
+  }
+  .card-title .who{color:var(--gold);display:block;font-size:20px;font-weight:600;margin-top:6px;letter-spacing:0.03em;font-family:'Barlow Condensed',sans-serif;-webkit-text-fill-color:var(--gold);}
+  .card-lines{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:16px;
+    margin:20px 0;
+    position:relative;
+  }
+  .card-line{
+    font-size:15px;
+    line-height:1.4;
+    padding-left:14px;
+    border-left:2px solid var(--gold);
+    color:#f2f0ec;
+  }
+  .card-line .tag{
+    display:block;
+    font-family:'Barlow Condensed',sans-serif;
+    color:var(--gold);
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    margin-bottom:3px;
+  }
+
+  /* density scales down as more answers are starred, so any count still fits */
+  .card[data-density="compact"] .card-lines{gap:11px;}
+  .card[data-density="compact"] .card-line{font-size:13px;line-height:1.35;}
+  .card[data-density="compact"] .card-line .tag{font-size:10px;margin-bottom:2px;}
+
+  .card[data-density="dense"] .card-lines{gap:8px;}
+  .card[data-density="dense"] .card-line{font-size:11.5px;line-height:1.3;padding-left:11px;}
+  .card[data-density="dense"] .card-line .tag{font-size:9px;letter-spacing:0.12em;margin-bottom:2px;}
+
+  .card[data-density="ultra"] .card-lines{gap:6px;}
+  .card[data-density="ultra"] .card-line{font-size:10px;line-height:1.28;padding-left:9px;border-left-width:1.5px;}
+  .card[data-density="ultra"] .card-line .tag{font-size:8px;letter-spacing:0.1em;margin-bottom:1px;}
+
+  .card[data-density="max"] .card-lines{gap:4px;}
+  .card[data-density="max"] .card-line{font-size:8.5px;line-height:1.25;padding-left:7px;border-left-width:1.5px;}
+  .card[data-density="max"] .card-line .tag{font-size:7px;letter-spacing:0.08em;margin-bottom:1px;}
+  .card-footer{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-top:1px solid var(--line);
+    padding-top:14px;
+    position:relative;
+  }
+  .card-footer .brand{
+    font-family:'Barlow Condensed',sans-serif;
+    font-weight:700;
+    letter-spacing:0.08em;
+    font-size:13px;
+    color:var(--text-dim);
+  }
+  .card-footer .brand span{color:var(--red);}
+  .card-footer .date{font-size:11px;color:var(--text-dim);}
+
+  /* ---------- FULL SUMMARY CTA + DOC ---------- */
+  .full-summary-cta{
+    text-align:center;
+    padding:10px 20px 70px;
+  }
+  .full-summary-cta h3{
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:24px;
+    letter-spacing:0.03em;
+    margin-bottom:10px;
+  }
+  .full-summary-cta p{
+    color:var(--text-dim);
+    font-size:14px;
+    line-height:1.6;
+    max-width:420px;
+    margin:0 auto 20px;
+  }
+
+  #fullSummaryCard{
+    width:900px;
+    background:#0d0d0d;
+    padding:70px 70px 60px;
+    font-family:'DM Sans',sans-serif;
+    color:var(--text);
+    position:relative;
+  }
+  #fullSummaryCard .fs-header{
+    text-align:center;
+    border-bottom:1px solid var(--line);
+    padding-bottom:36px;
+    margin-bottom:40px;
+  }
+  #fullSummaryCard .fs-eyebrow{
+    font-family:'Barlow Condensed',sans-serif;
+    color:var(--gold);
+    letter-spacing:0.35em;
+    font-size:13px;
+    font-weight:700;
+  }
+  #fullSummaryCard .fs-title{
+    font-family:'Anton',sans-serif;
+    font-weight:400;
+    font-size:64px;
+    letter-spacing:0.01em;
+    margin-top:14px;
+    background:linear-gradient(100deg, #f2f0ec 0%, var(--gold) 45%, #f2f0ec 75%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+    color:transparent;
+  }
+  #fullSummaryCard .fs-who{
+    font-family:'Barlow Condensed',sans-serif;
+    color:var(--gold);
+    font-size:22px;
+    font-weight:600;
+    margin-top:8px;
+    letter-spacing:0.03em;
+  }
+  #fullSummaryCard .fs-date{
+    color:var(--text-dim);
+    font-size:13px;
+    margin-top:10px;
+  }
+  #fullSummaryCard .fs-section{margin-bottom:34px;}
+  #fullSummaryCard .fs-section-title{
+    font-family:'Barlow Condensed',sans-serif;
+    font-weight:700;
+    font-size:20px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    color:var(--red);
+    border-left:3px solid var(--gold);
+    padding-left:12px;
+    margin-bottom:16px;
+  }
+  #fullSummaryCard .fs-qa{margin-bottom:18px;padding-left:15px;}
+  #fullSummaryCard .fs-q{
+    font-family:'DM Sans',sans-serif;
+    font-weight:700;
+    font-size:15px;
+    color:var(--text);
+    margin-bottom:6px;
+  }
+  #fullSummaryCard .fs-a{
+    font-size:15px;
+    line-height:1.6;
+    color:#c8c6c0;
+  }
+  #fullSummaryCard .fs-footer{
+    text-align:center;
+    border-top:1px solid var(--line);
+    padding-top:26px;
+    margin-top:20px;
+    font-family:'Barlow Condensed',sans-serif;
+    letter-spacing:0.1em;
+    font-size:14px;
+    color:var(--text-dim);
+  }
+  #fullSummaryCard .fs-footer span{color:var(--red);}
+
+  .empty-note{
+    text-align:center;color:var(--text-dim);font-size:14px;
+    max-width:380px;margin:0 auto 20px;line-height:1.5;
+  }
+
+  .name-input-row{
+    max-width:420px;margin:0 auto 18px;
+  }
+  .name-input-row label{
+    display:block;font-family:'Barlow Condensed',sans-serif;
+    font-size:13px;letter-spacing:0.08em;text-transform:uppercase;
+    color:var(--text-dim);margin-bottom:6px;
+  }
+  .name-input-row input{
+    width:100%;background:var(--bg-raised);border:1px solid var(--line);
+    border-radius:6px;color:var(--text);padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:16px;
+  }
+  .name-input-row input:focus{outline:none;border-color:var(--red);}
+
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:#1f1f1f;border:1px solid var(--line);color:var(--text);
+    padding:12px 20px;border-radius:8px;font-size:14px;
+    opacity:0;transition:all .25s ease;pointer-events:none;z-index:50;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  @media (max-width:480px){
+    .intro h1{font-size:38px;}
+    .wrap{padding:20px 14px 120px;}
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ================= VIEW: COVER ================= -->
+  <div class="view active" id="view-cover">
+    <div class="wrap">
+      <div class="intro">
+        <div class="eyebrow">Dream Body Blueprint</div>
+        <h1>The <span>Dream Self</span><br>Deep-Dive</h1>
+        <p>Before you can become that person, you have to be able to see them clearly. Answer honestly, in detail, no editing yourself.</p>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-text">
+            <div class="step-title">Answer the questions</div>
+            <div class="step-desc">Work through each section, honestly and in detail. Skip nothing.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div class="step-text">
+            <div class="step-title">Star the ones that hit hardest</div>
+            <div class="step-desc">Pick as many answers as you want to see again — the ones that matter most.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div class="step-text">
+            <div class="step-title">Press Done</div>
+            <div class="step-desc">Your starred answers become a card you can download and keep — as a screensaver, a lock screen, wherever you'll see it daily.</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center;padding:8px 0 60px;">
+        <button class="btn" id="startBtn">Start →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= VIEW: FORM ================= -->
+  <div class="view" id="view-form">
+    <div class="progress-shell">
+      <div class="progress-inner">
+        <div class="progress-top">
+          <div class="label">Progress</div>
+          <div class="count"><span id="answeredCount">0</span> / <span id="totalCount">0</span> answered</div>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+    </div>
+
+    <div class="wrap" style="padding-top:20px;">
+      <div id="sections"></div>
+
+      <div class="section" id="customSection">
+        <div class="section-head" id="customSectionHead">
+          <div style="display:flex;align-items:baseline;">
+            <span class="num">+</span>
+            <h2>Add Your Own</h2>
+          </div>
+          <div class="meta">
+            <span class="tally" id="customTally">0 added</span>
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+        </div>
+        <div class="section-body" id="customSectionBody">
+          <p style="color:var(--text-dim);font-size:14px;line-height:1.5;padding-top:14px;margin:0;">Got a question that matters to you but isn't on the list? Add it below.</p>
+          <div id="customContainer"></div>
+          <button class="btn ghost" id="addCustomBtn" style="margin:16px 0 20px;width:100%;">+ Add a question</button>
+        </div>
+      </div>
+
+      <div class="footer-actions">
+        <p>Starred a few answers already? You can jump to your card any time — you don't need to finish every question first.</p>
+        <button class="btn" id="goExportBtn">Done →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= VIEW: EXPORT ================= -->
+  <div class="view" id="view-export">
+    <div class="wrap" style="padding-top:28px;">
+      <div class="export-toolbar">
+        <div class="back-link" id="backToFormBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          Back to checklist
+        </div>
+        <div class="actions">
+          <button class="btn ghost" id="shuffleBtn">Shuffle picks</button>
+          <button class="btn" id="downloadBtn">Download PNG</button>
+        </div>
+      </div>
+
+      <div class="name-input-row">
+        <label for="nameInput">First name (optional)</label>
+        <input type="text" id="nameInput" placeholder="e.g. Sarah" maxlength="20">
+      </div>
+
+      <p class="empty-note" id="emptyNote">Star the answers back on the checklist that matter most and they'll show up here as your card.</p>
+    </div>
+
+    <div class="stage">
+      <div class="card" id="exportCard">
+        <div class="card-eyebrow">Becoming Them</div>
+        <div class="card-title">MY DREAM SELF<span class="who" id="cardWho"></span></div>
+        <div class="card-lines" id="cardLines"></div>
+        <div class="card-footer">
+          <div class="brand">DREAM <span>BODY</span> BLUEPRINT</div>
+          <div class="date" id="cardDate"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrap full-summary-cta">
+      <div class="rule"></div>
+      <h3>Want The Whole Thing, Not Just The Card?</h3>
+      <p>Download every question you've answered — not just your starred picks — as one image to keep or print.</p>
+      <button class="btn ghost" id="downloadFullBtn">Download Full Checklist (PNG)</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- off-screen render target for the full-summary export -->
+<div id="fullSummaryWrap" style="position:absolute; left:-99999px; top:0;">
+  <div id="fullSummaryCard"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------------- DATA ---------------- */
+const DATA = [
+  { title:"Daily Rhythm", q:[
+    { q:"What time do they wake up?", hint:"Alarm blaring, or awake before it even goes off?" },
+    { q:"What's the first thing they do when they wake up?", hint:"Straight to the phone, or something healthier?" },
+    { q:"Do they have a morning routine (stretching, coffee, journaling)?", hint:"Or is it straight into the chaos, no routine at all?" },
+    { q:"What time do they go to bed, and what does their wind-down look like?", hint:"Screens off and calm, or scrolling till they crash?" },
+    { q:"How do they structure their day — organised, or chaos?", hint:"Everything scheduled and on time, or winging it and hoping for the best?" }
+  ]},
+  { title:"Physical Presence & Body Language", q:[
+    { q:"How do they walk?", hint:"Rushed and head down, or unhurried and upright?" },
+    { q:"How do they stand in a room full of people?", hint:"Shrinking into a corner, or taking up their space?" },
+    { q:"What's their eye contact like?", hint:"Holds it, or looks away first?" },
+    { q:"How do they dress?", hint:"Picking outfits they actually want to wear, or dressing to hide?" },
+    { q:"What's their energy like, day to day?", hint:"Do they wake up switched on, or drag themselves through the day?" },
+    { q:"How do they move through physical spaces (confident, cautious, graceful)?", hint:"Move like they belong there, or apologise for existing?" }
+  ]},
+  { title:"Communication Style", q:[
+    { q:"How do they talk — tone, pace, volume?", hint:"Confident and direct, or hesitant and unsure?" },
+    { q:"How do they express disagreement or say no?", hint:"Says it straight, or dances around it?" },
+    { q:"How do they give compliments or praise?", hint:"Freely and specifically, or rarely at all?" },
+    { q:"How do they ask for what they need?", hint:"Directly, or hints and hopes someone notices?" }
+  ]},
+  { title:"How They Interact With People", q:[
+    { q:"How do they treat strangers (a barista, a stranger on the street)?", hint:"Warm and present, or polite but closed off?" },
+    { q:"How do they treat close friends versus acquaintances?", hint:"Same person either way, or a different version shows up?" },
+    { q:"How do they show up for people they love?", hint:"First call in a crisis, or good in theory only? Real question — is the person you're becoming actually reliable?" },
+    { q:"Do they remember details about people and follow up?", hint:"Asks 'how did that thing go?' three weeks later?" }
+  ]},
+  { title:"Caring & Empathy", q:[
+    { q:"How do they treat people who can't do anything for them?", hint:"Same warmth for a waiter as for their boss?" },
+    { q:"How do they respond when someone else is struggling?", hint:"Fully present and helpful, or uncomfortable and distant?" },
+    { q:"How do they handle other people's mistakes?", hint:"Give grace, or hold it over them?" },
+    { q:"Do they notice when someone needs support, or does someone have to ask?", hint:"Picks up on it themselves, or waits to be told?" },
+    { q:"How do they treat people who disagree with them?", hint:"Curious and respectful, or defensive and dismissive?" }
+  ]},
+  { title:"Emotional Regulation & Stress", q:[
+    { q:"How do they handle stress in the moment (breathing, walking away, talking it out)?", hint:"Or does it just build up until it spills out?" },
+    { q:"How do they respond to criticism?", hint:"Hears it and sits with it, or gets defensive?" },
+    { q:"How do they process disappointment or failure?", hint:"Feels it and moves, or spirals on it for days?" },
+    { q:"What do they do when they're angry?", hint:"Handles it like an adult, or lets it leak out sideways?" },
+    { q:"How quickly do they recover from a bad mood?", hint:"Back to normal in an hour, or carries it all day?" },
+    { q:"What's their self-talk like during hard moments?", hint:"Would they speak to a mate the way they speak to themselves?" },
+    { q:"What do they do when life gets hard — do they fold, or grit their teeth and get through it?", hint:"This is the one that actually decides whether they hit their goal or not." }
+  ]},
+  { title:"Relationships & Boundaries", q:[
+    { q:"How do they set boundaries with others?", hint:"Clearly and calmly, or only once they've hit breaking point?" },
+    { q:"How do they handle conflict?", hint:"Addresses it early, or avoids it until it's unavoidable?" },
+    { q:"How do they show love or appreciation?", hint:"Words, actions, time, gifts — what's their language?" },
+    { q:"What do they tolerate, and what do they not tolerate, from others?", hint:"What would they walk away from now that they currently put up with?" },
+    { q:"How do they repair a relationship after a disagreement?", hint:"Reaches out first, or waits for the other person to?" }
+  ]},
+  { title:"Habits & Discipline", q:[
+    { q:"What does training actually look like for them, week to week?", hint:"Non-negotiable part of the week, or squeezed in if there's time?" },
+    { q:"What's their day-to-day relationship with food?", hint:"Simple and consistent, or swinging between 'perfect' and 'screw it'?" },
+    { q:"What habits do they never skip?", hint:"The one thing that happens no matter what kind of day it's been?" },
+    { q:"How do they spend their free time?", hint:"Recharges them, or just fills the hours?" },
+    { q:"What do they say no to in order to protect their time or energy?", hint:"What do they turn down now that they used to always say yes to?" }
+  ]},
+  { title:"Body & Food Relationship", q:[
+    { q:"How do they feel catching their reflection unexpectedly?", hint:"Neutral, or a moment that ruins the next hour?" },
+    { q:"How do they talk about their body — to themselves, and out loud to others?", hint:"Kind and matter-of-fact, or the go-to joke or put-down?" },
+    { q:"What do they do at a dinner out, a birthday, a boozy weekend — skip it, enjoy it and move on, or spiral about it after?", hint:"Enjoys it and carries on, or pays for it in their head for days?" },
+    { q:"What does a \"bad day\" look like for them, and what does the next morning look like?", hint:"Back on track by breakfast, or writes off the whole week?" },
+    { q:"How does exercise fit into who they are — non-negotiable, enjoyable, just part of them, or something they have to talk themselves into?", hint:"Something they are, or something they have to force?" },
+    { q:"How do they feel in the clothes they currently avoid wearing?", hint:"Wearing it without a second thought?" }
+  ]},
+  { title:"Mindset & Self-Talk", q:[
+    { q:"How confident are they, and where does that confidence come from?", hint:"Earned through evidence, or just decided one day?" },
+    { q:"What do they believe about themselves that's different from now?", hint:"What do they know to be true that current-them doesn't believe yet?" },
+    { q:"How do they talk to themselves when they mess up?", hint:"Same tone as a mate would use, or brutal?" },
+    { q:"What's their relationship with fear or doubt?", hint:"Feels it and does it anyway, or waits for it to disappear first?" },
+    { q:"How do they define success for themselves?", hint:"By someone else's scoreboard, or their own?" }
+  ]},
+  { title:"Goals & Follow-Through", q:[
+    { q:"How do they approach a goal they've set for themselves?", hint:"Breaks it down and starts, or waits for the 'right' time? Doesn't have to be a career goal — could be a habit, a hobby, a fitness target, anything they're chasing." },
+    { q:"Do they still follow through when they don't feel like it?", hint:"Shows up anyway on the days motivation's nowhere to be found?" },
+    { q:"How do they handle tasks or habits they don't enjoy but know matter?", hint:"Gets it done regardless, or finds every reason to put it off?" },
+    { q:"How ambitious are they, and toward what?", hint:"Health, family, a skill, freedom, peace of mind — what are they actually chasing?" },
+    { q:"How do they celebrate wins, big or small?", hint:"Acknowledges the progress, or moves the goalpost straight away?" }
+  ]},
+  { title:"Environment & Lifestyle", q:[
+    { q:"What does their living space look like?", hint:"Calm and cared for, or chaotic and put off?" },
+    { q:"How organized or minimal is their environment?", hint:"Everything has a place, or 'organised chaos'?" },
+    { q:"What's in their car, bag, or daily carry?", hint:"Stocked and ready, or scrambling every morning?" },
+    { q:"What kind of experiences do they prioritize spending money on?", hint:"Time with people, travel, learning — where does the money actually go?" }
+  ]},
+  { title:"Values & Priorities", q:[
+    { q:"What matters most to them, in order?", hint:"What they'd actually say if they're honest, not what sounds good?" },
+    { q:"How do they spend a truly free Saturday?", hint:"No obligations, no guilt — what does that day look like?" },
+    { q:"What would they never compromise on?", hint:"The line that doesn't move, no matter what?" },
+    { q:"What legacy or impact do they want to have?", hint:"What do they want people to say about them when they're not in the room?" }
+  ]}
+];
+
+/* answers[secIdx][qIdx] = string, stars = Set of "secIdx-qIdx" */
+const answers = DATA.map(sec => sec.q.map(() => ""));
+const stars = new Set();
+
+let totalQuestions = DATA.reduce((sum, s) => sum + s.q.length, 0);
+document.getElementById('totalCount').textContent = totalQuestions;
+
+/* ---------------- BUILD FORM ---------------- */
+const sectionsEl = document.getElementById('sections');
+
+DATA.forEach((sec, si) => {
+  const secDiv = document.createElement('div');
+  secDiv.className = 'section';
+  secDiv.id = `section-${si}`;
+
+  const head = document.createElement('div');
+  head.className = 'section-head';
+  head.innerHTML = `
+    <div style="display:flex;align-items:baseline;">
+      <span class="num">${String(si+1).padStart(2,'0')}</span>
+      <h2>${sec.title}</h2>
+    </div>
+    <div class="meta">
+      <span class="tally" id="tally-${si}">0/${sec.q.length}</span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    </div>`;
+  head.addEventListener('click', () => {
+    secDiv.classList.toggle('open');
+    const body = secDiv.querySelector('.section-body');
+    if(secDiv.classList.contains('open')){
+      body.style.maxHeight = body.scrollHeight + 400 + 'px';
+    } else {
+      body.style.maxHeight = '0';
+    }
+  });
+
+  const body = document.createElement('div');
+  body.className = 'section-body';
+
+  sec.q.forEach((item, qi) => {
+    const qBlock = document.createElement('div');
+    qBlock.className = 'q-block';
+    qBlock.innerHTML = `
+      <div class="q-row">
+        <div class="q-text-wrap">
+          <div class="q-text">${item.q}</div>
+          <div class="q-hint">${item.hint}</div>
+        </div>
+        <button class="star-btn" data-key="${si}-${qi}" title="Feature this in your Dream Self card">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>
+        </button>
+      </div>
+      <textarea data-si="${si}" data-qi="${qi}" placeholder="Type your answer..." rows="1"></textarea>
+    `;
+    body.appendChild(qBlock);
+  });
+
+  secDiv.appendChild(head);
+  secDiv.appendChild(body);
+  sectionsEl.appendChild(secDiv);
+});
+
+// open first section by default
+document.getElementById('section-0').classList.add('open');
+{
+  const body = document.querySelector('#section-0 .section-body');
+  body.style.maxHeight = body.scrollHeight + 400 + 'px';
+}
+
+/* ---------------- TEXTAREA HANDLING ---------------- */
+sectionsEl.addEventListener('input', (e) => {
+  if(e.target.tagName !== 'TEXTAREA') return;
+  const si = +e.target.dataset.si, qi = +e.target.dataset.qi;
+  answers[si][qi] = e.target.value;
+  autoGrow(e.target);
+  updateProgress();
+  updateTally(si);
+});
+
+function autoGrow(el){
+  el.style.height = 'auto';
+  el.style.height = (el.scrollHeight) + 'px';
+  // keep parent accordion from clipping
+  const secBody = el.closest('.section-body');
+  if(secBody) secBody.style.maxHeight = secBody.scrollHeight + 100 + 'px';
+}
+
+/* ---------------- CUSTOM "ADD YOUR OWN" QUESTIONS ---------------- */
+const customItems = {}; // id -> {question, answer}
+let customIdCounter = 0;
+const customContainer = document.getElementById('customContainer');
+const customSectionEl = document.getElementById('customSection');
+
+document.getElementById('customSectionHead').addEventListener('click', () => {
+  customSectionEl.classList.toggle('open');
+  const body = document.getElementById('customSectionBody');
+  if(customSectionEl.classList.contains('open')){
+    body.style.maxHeight = body.scrollHeight + 400 + 'px';
+  } else {
+    body.style.maxHeight = '0';
+  }
+});
+
+function growCustomBody(){
+  if(customSectionEl.classList.contains('open')){
+    const body = document.getElementById('customSectionBody');
+    body.style.maxHeight = body.scrollHeight + 400 + 'px';
+  }
+}
+
+document.getElementById('addCustomBtn').addEventListener('click', () => {
+  const id = `c${customIdCounter++}`;
+  customItems[id] = { question: '', answer: '' };
+
+  const block = document.createElement('div');
+  block.className = 'q-block';
+  block.dataset.id = id;
+  block.innerHTML = `
+    <div class="q-row">
+      <div class="q-text-wrap">
+        <input type="text" class="custom-q-input" data-id="${id}" placeholder="Type your own question...">
+      </div>
+      <button class="star-btn" data-key="custom-${id}" title="Feature this in your Dream Self card">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.9L5.7 21l1.7-7L2 9.2l7.1-.6z"/></svg>
+      </button>
+      <button class="remove-btn" data-id="${id}" title="Remove this question">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <textarea class="custom-a-input" data-id="${id}" placeholder="Type your answer..." rows="1"></textarea>
+  `;
+  customContainer.appendChild(block);
+  updateCustomTally();
+  growCustomBody();
+  block.querySelector('.custom-q-input').focus();
+});
+
+customContainer.addEventListener('input', (e) => {
+  const id = e.target.dataset.id;
+  if(!id || !customItems[id]) return;
+  if(e.target.classList.contains('custom-q-input')){
+    customItems[id].question = e.target.value;
+  } else if(e.target.classList.contains('custom-a-input')){
+    customItems[id].answer = e.target.value;
+    autoGrow(e.target);
+  }
+});
+
+customContainer.addEventListener('click', (e) => {
+  const removeBtn = e.target.closest('.remove-btn');
+  if(!removeBtn) return;
+  const id = removeBtn.dataset.id;
+  const key = `custom-${id}`;
+  stars.delete(key);
+  delete customItems[id];
+  const block = customContainer.querySelector(`.q-block[data-id="${id}"]`);
+  if(block) block.remove();
+  updateCustomTally();
+  growCustomBody();
+});
+
+function updateCustomTally(){
+  const count = Object.keys(customItems).length;
+  document.getElementById('customTally').textContent = `${count} added`;
+}
+
+/* ---------------- STAR HANDLING (shared: fixed + custom) ---------------- */
+function getAnswerForKey(key){
+  if(key.startsWith('custom-')){
+    const id = key.slice(7);
+    return customItems[id] ? customItems[id].answer : '';
+  }
+  const [si, qi] = key.split('-').map(Number);
+  return answers[si][qi] || '';
+}
+
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.star-btn');
+  if(!btn) return;
+  const key = btn.dataset.key;
+  const textareaVal = getAnswerForKey(key).trim();
+
+  if(!textareaVal){
+    showToast("Answer it first, then star it ⭐");
+    return;
+  }
+
+  if(stars.has(key)){
+    stars.delete(key);
+    btn.classList.remove('active');
+  } else {
+    stars.add(key);
+    btn.classList.add('active');
+  }
+});
+
+/* ---------------- PROGRESS ---------------- */
+function updateProgress(){
+  let count = 0;
+  answers.forEach(sec => sec.forEach(a => { if(a.trim()) count++; }));
+  document.getElementById('answeredCount').textContent = count;
+  const pct = totalQuestions ? Math.round((count/totalQuestions)*100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+function updateTally(si){
+  const count = answers[si].filter(a => a.trim()).length;
+  document.getElementById(`tally-${si}`).textContent = `${count}/${DATA[si].q.length}`;
+}
+
+/* ---------------- TOAST ---------------- */
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+/* ---------------- VIEW SWITCH ---------------- */
+const viewCover = document.getElementById('view-cover');
+const viewForm = document.getElementById('view-form');
+const viewExport = document.getElementById('view-export');
+
+document.getElementById('startBtn').addEventListener('click', () => {
+  viewCover.classList.remove('active');
+  viewForm.classList.add('active');
+  window.scrollTo(0,0);
+});
+
+document.getElementById('goExportBtn').addEventListener('click', () => {
+  if(stars.size === 0){
+    showToast("Star at least one answer first ⭐");
+    return;
+  }
+  renderCard();
+  viewForm.classList.remove('active');
+  viewExport.classList.add('active');
+  window.scrollTo(0,0);
+});
+
+document.getElementById('backToFormBtn').addEventListener('click', () => {
+  viewExport.classList.remove('active');
+  viewForm.classList.add('active');
+  window.scrollTo(0,0);
+});
+
+document.getElementById('shuffleBtn').addEventListener('click', renderCard);
+
+/* ---------------- RENDER CARD ---------------- */
+function renderCard(){
+  const cardLines = document.getElementById('cardLines');
+  const emptyNote = document.getElementById('emptyNote');
+  const exportCard = document.getElementById('exportCard');
+  cardLines.innerHTML = '';
+
+  const starredList = Array.from(stars).map(key => {
+    if(key.startsWith('custom-')){
+      const id = key.slice(7);
+      const item = customItems[id];
+      return { section: "Your Own", answer: item ? item.answer : '' };
+    }
+    const [si, qi] = key.split('-').map(Number);
+    return { section: DATA[si].title, question: DATA[si].q[qi].q, answer: answers[si][qi] };
+  });
+
+  if(starredList.length === 0){
+    emptyNote.style.display = 'block';
+  } else {
+    emptyNote.style.display = 'none';
+  }
+
+  // more starred answers = smaller text + shorter truncation, so any count still fits on one card
+  const count = starredList.length;
+  let density = 'normal', maxLen = 90;
+  if(count > 24){ density = 'max'; maxLen = 42; }
+  else if(count > 16){ density = 'ultra'; maxLen = 55; }
+  else if(count > 10){ density = 'dense'; maxLen = 70; }
+  else if(count > 6){ density = 'compact'; maxLen = 80; }
+  exportCard.dataset.density = density;
+
+  starredList.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'card-line';
+    const truncated = item.answer.length > maxLen ? item.answer.slice(0, maxLen - 3).trim() + '…' : item.answer;
+    div.innerHTML = `<span class="tag">${item.section}</span>${truncated}`;
+    cardLines.appendChild(div);
+  });
+
+  const name = document.getElementById('nameInput').value.trim();
+  document.getElementById('cardWho').textContent = name ? name.toUpperCase() : '';
+
+  const dateStr = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+  document.getElementById('cardDate').textContent = dateStr;
+}
+
+document.getElementById('nameInput').addEventListener('input', renderCard);
+
+/* ---------------- DOWNLOAD ---------------- */
+document.getElementById('downloadBtn').addEventListener('click', () => {
+  if(stars.size === 0){
+    showToast("Star at least one answer first ⭐");
+    return;
+  }
+  const card = document.getElementById('exportCard');
+  showToast("Generating your image...");
+  html2canvas(card, { scale: 3, backgroundColor: '#0d0d0d' }).then(canvas => {
+    const link = document.createElement('a');
+    const name = document.getElementById('nameInput').value.trim();
+    link.download = `dream-self${name ? '-' + name.toLowerCase() : ''}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showToast("Downloaded — set it as your lock screen 🔒");
+  }).catch(() => {
+    showToast("Something went wrong — try again");
+  });
+});
+
+/* ---------------- FULL SUMMARY DOWNLOAD ---------------- */
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function buildFullSummary(){
+  const name = document.getElementById('nameInput').value.trim();
+  const dateStr = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+
+  let sectionsHtml = '';
+  DATA.forEach((sec, si) => {
+    const answered = sec.q
+      .map((item, qi) => ({ q: item.q, a: answers[si][qi] }))
+      .filter(pair => pair.a.trim());
+    if(answered.length === 0) return;
+    sectionsHtml += `<div class="fs-section">
+      <div class="fs-section-title">${escapeHtml(sec.title)}</div>
+      ${answered.map(pair => `
+        <div class="fs-qa">
+          <div class="fs-q">${escapeHtml(pair.q)}</div>
+          <div class="fs-a">${escapeHtml(pair.a)}</div>
+        </div>`).join('')}
+    </div>`;
+  });
+
+  const customAnswered = Object.values(customItems).filter(item => item.answer.trim());
+  if(customAnswered.length > 0){
+    sectionsHtml += `<div class="fs-section">
+      <div class="fs-section-title">Your Own Questions</div>
+      ${customAnswered.map(item => `
+        <div class="fs-qa">
+          <div class="fs-q">${escapeHtml(item.question || 'Untitled question')}</div>
+          <div class="fs-a">${escapeHtml(item.answer)}</div>
+        </div>`).join('')}
+    </div>`;
+  }
+
+  document.getElementById('fullSummaryCard').innerHTML = `
+    <div class="fs-header">
+      <div class="fs-eyebrow">Dream Body Blueprint</div>
+      <div class="fs-title">MY DREAM SELF</div>
+      ${name ? `<div class="fs-who">${escapeHtml(name.toUpperCase())}</div>` : ''}
+      <div class="fs-date">${dateStr}</div>
+    </div>
+    ${sectionsHtml}
+    <div class="fs-footer">DREAM <span>BODY</span> BLUEPRINT — DEEP-DIVE CHECKLIST</div>
+  `;
+
+  return sectionsHtml.length > 0 || customAnswered.length > 0;
+}
+
+document.getElementById('downloadFullBtn').addEventListener('click', () => {
+  const hasContent = buildFullSummary();
+  if(!hasContent){
+    showToast("Answer a few questions first, then come back");
+    return;
+  }
+  showToast("Generating your full checklist image...");
+  html2canvas(document.getElementById('fullSummaryCard'), { scale: 2, backgroundColor: '#0d0d0d' }).then(canvas => {
+    const link = document.createElement('a');
+    const name = document.getElementById('nameInput').value.trim();
+    link.download = `dream-self-full${name ? '-' + name.toLowerCase() : ''}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showToast("Downloaded — your full deep-dive, saved 📄");
+  }).catch(() => {
+    showToast("Something went wrong — try again");
+  });
+});
+
+updateProgress();
+</script>
+</body>
+</html>
